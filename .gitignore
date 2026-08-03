@@ -1,6 +1,3 @@
-*~
-/target/
-*.wat
-*.wasm
-/out.json
-/out.csv
+/target
+Cargo.lock
+*.log

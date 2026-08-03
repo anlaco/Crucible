@@ -1,0 +1,21 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/crucible-core",
+    "crates/crucible",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["ANLACO"]
+description = "Estándar abierto para describir y simular bancos de test"
+repository = "https://github.com/ANLACO/Crucible"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
+thiserror = "1"

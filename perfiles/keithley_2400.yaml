@@ -1,0 +1,52 @@
+dispositivo:
+  modelo: KEITHLEY-2400
+  tipo: instrumento
+  idn: "Keithley,2400,1234567,A1.2"
+
+protocolo: scpi
+
+estado:
+  voltaje_fuente: 0.0
+  corriente_limite: 0.105
+  output: false
+  modo: voltage
+
+comandos:
+  - patron: "*IDN?"
+    respuesta: "Keithley,2400,1234567,A1.2"
+  - patron: "*RST"
+    muta:
+      voltaje_fuente: "0.0"
+      corriente_limite: "0.105"
+      output: "false"
+  - patron: "OUTP ON"
+    muta: { output: "true" }
+  - patron: "OUTP OFF"
+    muta: { output: "false" }
+  - patron: "SOUR:VOLT <x>"
+    muta: { voltaje_fuente: "<x>" }
+  - patron: "SOUR:CURR <x>"
+    muta: { corriente_limite: "<x>" }
+  - patron: "MEAS:VOLT?"
+    modelo: medir_voltaje
+  - patron: "MEAS:CURR?"
+    modelo: medir_corriente
+  - patron: "MEAS:RES?"
+    modelo: medir_resistencia
+
+modelos:
+  medir_voltaje:
+    tipo: formula
+    cuando: { output: "true" }
+    expr: "voltaje_fuente + gauss(0, 0.001)"
+    fallback: "0.0"
+  medir_corriente:
+    tipo: formula
+    cuando: { output: "true" }
+    expr: "voltaje_fuente / 1000.0"
+    fallback: "0.0"
+  medir_resistencia:
+    tipo: formula
+    cuando: { output: "true" }
+    expr: "1000.0"
+    fallback: "0.0"

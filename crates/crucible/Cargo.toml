@@ -1,0 +1,13 @@
+[package]
+name = "crucible"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description.workspace = true
+
+[dependencies]
+crucible-core = { path = "../crucible-core" }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+serde_yaml = { workspace = true }
