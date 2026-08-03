@@ -1,0 +1,6 @@
+*~
+/target/
+*.wat
+*.wasm
+/out.json
+/out.csv
