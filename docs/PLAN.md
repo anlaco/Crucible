@@ -26,7 +26,7 @@ equipos se apoyan en él, no al revés.
 | Transporte | Socket raw (5025) primero, HiSLIP (4880) después |
 | Protocolo | SCPI-99 conforme por clase + comandos obligatorios IEEE 488.2 |
 | Catálogo v0.1 | Clases IVI genéricas: DMM, fuente DC, matriz de conmutación |
-| Definición | Declarativa (TOML) + comportamiento en plugin de código |
+| Definición | Declarativa (**YAML**) + comportamiento en plugin de código |
 | Interfaz | Ficheros + web embebida |
 | Producto | Open source, licencia dual MIT / Apache-2.0 |
 | Desarrollo | Íntegramente Linux + pyvisa; Windows como aceptación |
@@ -142,6 +142,46 @@ instrusim/
 **Aviso de licencia:** `lxi-rs` implementa HiSLIP en Rust pero su implementación principal es
 **GPLv3** y está enfocada a Unix. Incompatible con MIT/Apache. Se usa **solo como referencia de
 lectura**; HiSLIP se implementa de cero.
+
+## Formato del catálogo: YAML con `serde-saphyr`
+
+Se eligió YAML sobre TOML por tres razones propias de este dato: el árbol SCPI es
+jerárquico y TOML se degrada pasando de dos niveles; las **anclas y merge keys**
+(`&base`, `<<: *base`) permiten que dos modelos de la misma familia compartan el
+90% de su definición sin inventarse un mecanismo de herencia propio; y los
+**bloques `|`** son el sitio natural para los scripts de comportamiento cuando
+llegue Rhai.
+
+**Crate: `serde-saphyr` 1.0.** Panorama comprobado en crates.io en agosto de 2026:
+`serde_yaml` está archivado desde marzo de 2024, `serde_yml` tiene aviso de
+seguridad, `serde_yaml_ng` y `serde_norway` llevan más de un año sin publicar, y
+`yaml-rust2` es analizador puro sin integración con serde. `serde-saphyr` acumula
+3,1 M de descargas en 90 días sobre 4,0 M totales —tres cuartas partes de su vida
+en un trimestre—, ha llegado a 1.0 y se mantiene al día.
+
+**Regla del esquema, verificada ejecutándola.** `serde-saphyr` no tiene DOM
+intermedio: deserializa contra el tipo destino. Por tanto `ON` en un campo
+`String` es la cadena `"ON"`, mientras que `no` en un campo `bool` sí se
+interpreta como falso. De ahí sale una norma que no se puede saltar:
+
+> **Nunca declarar un campo `bool` donde pueda aparecer un mnemónico SCPI.**
+> Los valores SCPI son siempre cadenas en el esquema.
+
+Con eso, el "problema de Noruega" —que `NO`, `ON`, `OFF` e `Y` se conviertan en
+booleanos— no queda mitigado sino estructuralmente imposible. Debe haber un test
+que cargue esos cuatro mnemónicos sin comillas y compruebe que salen como
+cadenas, para que un cambio futuro de parser avise.
+
+**Coste asumido:** son las primeras dependencias externas del proyecto, 23 crates
+contando serde. Ninguna exige toolchain de C y todas las licencias entran en la
+lista permitida, así que la compilación limpia en Windows sigue en pie. Quedan
+confinadas en `instrusim-config`; el núcleo, la capa SCPI y los modelos siguen
+sin dependencias.
+
+**Organización del catálogo:** un fichero por modelo en `models/` describiendo
+*qué es* el instrumento, y un fichero por banco en `racks/` diciendo *qué hay
+montado* y cómo está cableado. Así el catálogo crece con aportaciones ajenas sin
+obligar a tocar los bancos de nadie.
 
 ## Fases
 
