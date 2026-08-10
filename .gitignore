@@ -1,0 +1,13 @@
+/target
+**/*.rs.bk
+*.pdb
+
+# Entornos de prueba Python (suite pyvisa)
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Editores
+.vscode/
+.idea/
+*.swp
