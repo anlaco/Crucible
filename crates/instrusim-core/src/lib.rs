@@ -4,11 +4,12 @@
 //! que lo contiene, en este caso el crate entero. Con `///` documentas el
 //! elemento que viene justo después. `cargo doc --open` los convierte en web.
 
-// Declara que existe un módulo `time` cuyo código está en `src/time.rs`.
-// Sin esta línea, ese fichero simplemente no se compila: en Rust los módulos
-// se declaran explícitamente, no se descubren por estar en la carpeta.
+pub mod clock;
+pub mod signal;
 pub mod time;
 
-// Reexporta `SimTime` en la raíz del crate, para que quien lo use pueda escribir
-// `instrusim_core::SimTime` en vez de `instrusim_core::time::SimTime`.
+// Reexporta los tipos principales en la raíz del crate, para que quien los use
+// pueda escribir `instrusim_core::SimTime` en vez de la ruta completa.
+pub use clock::{Clock, VirtualClock, WallClock};
+pub use signal::{Signal, Waveform};
 pub use time::SimTime;
