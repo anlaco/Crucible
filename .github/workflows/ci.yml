@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Se compila y se prueba en los dos sistemas desde el primer día. La promesa
+  # del proyecto es un binario que funcione igual en Linux y en Windows sin
+  # instalar nada, y esa promesa solo se sostiene si se verifica en cada commit:
+  # una dependencia que exija toolchain de C se detecta aquí, no seis meses
+  # después cuando ya haya que rehacer medio motor.
+  test:
+    name: Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --all-features --workspace
+
+  lint:
+    name: Formato y clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all --check
+      - run: cargo clippy --all-targets --workspace -- -D warnings
+
+  # El proyecto es MIT/Apache-2.0. Una dependencia GPL contaminaría la licencia
+  # entera, y en este nicho es un riesgo real: la implementación de HiSLIP que
+  # existe en Rust es GPLv3.
+  licencias:
+    name: Auditoría de licencias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: EmbarkStudios/cargo-deny-action@v2

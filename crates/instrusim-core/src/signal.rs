@@ -116,7 +116,12 @@ impl Signal {
 
     /// Construye una senoide sin desfase ni continua.
     pub fn sine(amplitude: f64, frequency: f64) -> Self {
-        Signal::Sine { amplitude, frequency, phase: 0.0, offset: 0.0 }
+        Signal::Sine {
+            amplitude,
+            frequency,
+            phase: 0.0,
+            offset: 0.0,
+        }
     }
 
     /// Añade ruido gaussiano a esta señal.
@@ -129,7 +134,10 @@ impl Signal {
 
     /// Multiplica la señal por una ganancia.
     pub fn scaled(self, gain: f64) -> Self {
-        Signal::Scaled { inner: Box::new(self), gain }
+        Signal::Scaled {
+            inner: Box::new(self),
+            gain,
+        }
     }
 
     /// Valor de la señal en un instante dado.
@@ -144,11 +152,19 @@ impl Signal {
         match self {
             Signal::Constant(v) => *v,
 
-            Signal::Sine { amplitude, frequency, phase, offset } => {
-                offset + amplitude * (TAU * fase_normalizada(*frequency, t) + phase).sin()
-            }
+            Signal::Sine {
+                amplitude,
+                frequency,
+                phase,
+                offset,
+            } => offset + amplitude * (TAU * fase_normalizada(*frequency, t) + phase).sin(),
 
-            Signal::Ramp { from, to, start, duration } => {
+            Signal::Ramp {
+                from,
+                to,
+                start,
+                duration,
+            } => {
                 if t <= *start {
                     *from
                 } else {
@@ -162,14 +178,32 @@ impl Signal {
                 }
             }
 
-            Signal::Square { amplitude, frequency, duty, offset } => {
+            Signal::Square {
+                amplitude,
+                frequency,
+                duty,
+                offset,
+            } => {
                 let fase = fase_normalizada(*frequency, t);
-                if fase < *duty { offset + amplitude } else { offset - amplitude }
+                if fase < *duty {
+                    offset + amplitude
+                } else {
+                    offset - amplitude
+                }
             }
 
-            Signal::Pulse { amplitude, start, width, baseline } => {
+            Signal::Pulse {
+                amplitude,
+                start,
+                width,
+                baseline,
+            } => {
                 let fin = *start + *width;
-                if t >= *start && t < fin { *amplitude } else { *baseline }
+                if t >= *start && t < fin {
+                    *amplitude
+                } else {
+                    *baseline
+                }
             }
 
             Signal::Noise { rms, seed } => rms * gaussiano(*seed, t.as_nanos()),
@@ -213,7 +247,11 @@ impl Waveform {
     pub fn new(start: SimTime, step: Duration, samples: Vec<f64>) -> Self {
         assert!(!step.is_zero(), "el paso de muestreo no puede ser cero");
         assert!(!samples.is_empty(), "una forma de onda necesita muestras");
-        Self { start, step, samples }
+        Self {
+            start,
+            step,
+            samples,
+        }
     }
 
     /// Valor interpolado linealmente. Fuera del rango se mantiene el extremo.
@@ -336,17 +374,22 @@ mod tests {
             duration: Duration::from_secs(2),
         };
 
-        assert_eq!(s.eval(SimTime::ZERO), 0.0);                        // antes
-        assert_eq!(s.eval(SimTime::from_secs_f64(1.0)), 0.0);          // justo al inicio
+        assert_eq!(s.eval(SimTime::ZERO), 0.0); // antes
+        assert_eq!(s.eval(SimTime::from_secs_f64(1.0)), 0.0); // justo al inicio
         assert!(casi_igual(s.eval(SimTime::from_secs_f64(2.0)), 5.0, 1e-9)); // mitad
-        assert_eq!(s.eval(SimTime::from_secs_f64(3.0)), 10.0);         // final
-        assert_eq!(s.eval(SimTime::from_secs_f64(99.0)), 10.0);        // después
+        assert_eq!(s.eval(SimTime::from_secs_f64(3.0)), 10.0); // final
+        assert_eq!(s.eval(SimTime::from_secs_f64(99.0)), 10.0); // después
     }
 
     #[test]
     fn la_cuadrada_conmuta_segun_el_ciclo_de_trabajo() {
         // 1 Hz, 25% de ciclo de trabajo, entre -1 y +1.
-        let s = Signal::Square { amplitude: 1.0, frequency: 1.0, duty: 0.25, offset: 0.0 };
+        let s = Signal::Square {
+            amplitude: 1.0,
+            frequency: 1.0,
+            duty: 0.25,
+            offset: 0.0,
+        };
         assert_eq!(s.eval(SimTime::from_secs_f64(0.1)), 1.0);
         assert_eq!(s.eval(SimTime::from_secs_f64(0.4)), -1.0);
         assert_eq!(s.eval(SimTime::from_secs_f64(1.1)), 1.0); // periodo siguiente
@@ -417,16 +460,16 @@ mod tests {
         let varianza = muestras.iter().map(|v| (v - media).powi(2)).sum::<f64>() / n as f64;
 
         assert!(media.abs() < rms * 0.05, "media desviada: {media}");
-        assert!(casi_igual(varianza.sqrt(), rms, rms * 0.05), "rms: {}", varianza.sqrt());
+        assert!(
+            casi_igual(varianza.sqrt(), rms, rms * 0.05),
+            "rms: {}",
+            varianza.sqrt()
+        );
     }
 
     #[test]
     fn la_forma_de_onda_interpola() {
-        let w = Waveform::new(
-            SimTime::ZERO,
-            Duration::from_secs(1),
-            vec![0.0, 10.0, 20.0],
-        );
+        let w = Waveform::new(SimTime::ZERO, Duration::from_secs(1), vec![0.0, 10.0, 20.0]);
 
         assert_eq!(w.eval(SimTime::ZERO), 0.0);
         assert!(casi_igual(w.eval(SimTime::from_secs_f64(0.5)), 5.0, 1e-9));
@@ -454,8 +497,16 @@ mod tests {
         assert!(casi_igual(captura[0], captura[1000], 1e-6));
 
         // Un cuarto de periodo son 250 ns: ahí está el máximo.
-        assert!(casi_igual(captura[250], 2.0, 1e-6), "pico: {}", captura[250]);
-        assert!(casi_igual(captura[750], -2.0, 1e-6), "valle: {}", captura[750]);
+        assert!(
+            casi_igual(captura[250], 2.0, 1e-6),
+            "pico: {}",
+            captura[250]
+        );
+        assert!(
+            casi_igual(captura[750], -2.0, 1e-6),
+            "valle: {}",
+            captura[750]
+        );
 
         // Y el recorrido completo es el esperado, sin pérdida de precisión pese
         // a estar en el segundo 3600 de simulación.

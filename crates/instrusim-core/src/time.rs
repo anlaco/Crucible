@@ -46,7 +46,9 @@ impl SimTime {
     /// Cómodo para escribir tests y para leer configuración.
     pub fn from_secs_f64(secs: f64) -> Self {
         debug_assert!(secs >= 0.0, "SimTime no puede ser negativo: {secs}");
-        Self { nanos: (secs * 1e9).round() as u64 }
+        Self {
+            nanos: (secs * 1e9).round() as u64,
+        }
     }
 
     /// El instante expresado en segundos.
@@ -74,7 +76,9 @@ impl Add<Duration> for SimTime {
         // ruidosamente si alguien pretende avanzar un intervalo absurdo: eso es
         // un error del programador, no una condición que tolerar en silencio.
         let d = u64::try_from(rhs.as_nanos()).expect("duración fuera de rango");
-        SimTime { nanos: self.nanos + d }
+        SimTime {
+            nanos: self.nanos + d,
+        }
     }
 }
 

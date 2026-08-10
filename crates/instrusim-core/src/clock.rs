@@ -45,7 +45,10 @@ impl VirtualClock {
     /// Crea un reloj virtual con la frecuencia de tic indicada.
     pub fn new(period: Duration) -> Self {
         assert!(!period.is_zero(), "el periodo del reloj no puede ser cero");
-        Self { now: SimTime::ZERO, period }
+        Self {
+            now: SimTime::ZERO,
+            period,
+        }
     }
 
     /// Atajo para expresar la frecuencia en hercios en vez de en periodo.
@@ -99,7 +102,11 @@ pub struct WallClock {
 impl WallClock {
     pub fn new(period: Duration) -> Self {
         assert!(!period.is_zero(), "el periodo del reloj no puede ser cero");
-        Self { origin: Instant::now(), now: SimTime::ZERO, period }
+        Self {
+            origin: Instant::now(),
+            now: SimTime::ZERO,
+            period,
+        }
     }
 
     pub fn from_hz(hz: f64) -> Self {
@@ -202,7 +209,10 @@ mod tests {
         let real = antes.elapsed();
 
         assert_eq!(reloj.now().as_nanos(), 25_000_000);
-        assert!(real < Duration::from_millis(60), "deriva excesiva: {real:?}");
+        assert!(
+            real < Duration::from_millis(60),
+            "deriva excesiva: {real:?}"
+        );
     }
 
     /// El motor guarda el reloj tras un `Box<dyn Clock>`, así que ambos tipos
