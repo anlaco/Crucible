@@ -93,8 +93,12 @@ impl World {
         self.now
     }
 
-    /// Solo lo llama el motor, al principio de cada tic.
-    pub(crate) fn set_now(&mut self, t: SimTime) {
+    /// Fija el instante actual.
+    ///
+    /// Normalmente solo lo llama el motor al principio de cada tic. Es público
+    /// para poder situar el mundo en un instante concreto desde un test o desde
+    /// un escenario, sin tener que ejecutar los tics intermedios.
+    pub fn set_now(&mut self, t: SimTime) {
         self.now = t;
     }
 
@@ -150,6 +154,20 @@ impl World {
     /// El valor en un nodo *ahora*. El atajo que usarán los instrumentos.
     pub fn potential_now(&self, id: NodeId) -> f64 {
         self.potential_at(id, self.now)
+    }
+
+    /// La diferencia de potencial entre dos bornes en un instante cualquiera.
+    ///
+    /// Hace falta para medir alterna: un multímetro no lee el valor eficaz de
+    /// un golpe, integra la señal a lo largo de su tiempo de apertura. Como los
+    /// nodos guardan señales evaluables, el instrumento puede muestrear esa
+    /// ventana a la resolución que necesite sin que el motor corra más deprisa.
+    pub fn differential_at(&self, high: &Terminal, low: &Terminal, t: SimTime) -> f64 {
+        let v = |term: &Terminal| match term.node {
+            Some(id) => self.potential_at(id, t),
+            None => 0.0,
+        };
+        v(high) - v(low)
     }
 
     /// La diferencia de potencial entre dos bornes, en el instante actual.

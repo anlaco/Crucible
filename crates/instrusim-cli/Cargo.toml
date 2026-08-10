@@ -1,0 +1,16 @@
+[package]
+name = "instrusim-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Binario de InstruSim"
+
+[[bin]]
+name = "instrusim"
+path = "src/main.rs"
+
+[dependencies]
+instrusim-core = { path = "../instrusim-core" }
+instrusim-model = { path = "../instrusim-model" }
+instrusim-net = { path = "../instrusim-net" }

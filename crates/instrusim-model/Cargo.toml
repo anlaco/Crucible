@@ -1,0 +1,11 @@
+[package]
+name = "instrusim-model"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Modelos de instrumento de InstruSim: clases IVI genéricas sobre el núcleo de simulación"
+
+[dependencies]
+instrusim-core = { path = "../instrusim-core" }
+instrusim-scpi = { path = "../instrusim-scpi" }

@@ -3,5 +3,34 @@
 version = 4
 
 [[package]]
+name = "instrusim-cli"
+version = "0.1.0"
+dependencies = [
+ "instrusim-core",
+ "instrusim-model",
+ "instrusim-net",
+]
+
+[[package]]
 name = "instrusim-core"
+version = "0.1.0"
+
+[[package]]
+name = "instrusim-model"
+version = "0.1.0"
+dependencies = [
+ "instrusim-core",
+ "instrusim-scpi",
+]
+
+[[package]]
+name = "instrusim-net"
+version = "0.1.0"
+dependencies = [
+ "instrusim-core",
+ "instrusim-model",
+]
+
+[[package]]
+name = "instrusim-scpi"
 version = "0.1.0"
