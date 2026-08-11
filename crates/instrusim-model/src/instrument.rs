@@ -1,21 +1,23 @@
-//! El contrato que cumple todo instrumento y el despacho de los comandos
-//! obligatorios.
+//! El contrato que cumple todo instrumento simulado en Rust.
 //!
 //! IEEE 488.2 exige que **todos** los instrumentos entiendan un puñado de
 //! comandos comunes: `*IDN?`, `*RST`, `*CLS`, `*ESE`, `*ESR?`, `*OPC`, `*SRE`,
 //! `*STB?`, `*TST?` y `*WAI`. SCPI añade `SYSTem:ERRor?` y `SYSTem:VERSion?`.
 //!
-//! Están implementados una sola vez, aquí, para todos. Un instrumento concreto
-//! solo escribe lo suyo, y por construcción no puede olvidarse de lo obligatorio
-//! ni implementarlo de forma distinta a sus hermanos.
-
-use std::sync::OnceLock;
+//! Están implementados una sola vez para todo el repositorio, en
+//! `instrusim_scpi::device`, y valen igual para los instrumentos de este módulo
+//! que para los descritos en un perfil YAML de `crucible-core`. Aquí solo queda
+//! el contrato propio del motor —el que sí conoce el [`World`]— y el puente que
+//! lo conecta con aquel despacho.
+//!
+//! Un instrumento concreto solo escribe lo suyo, y por construcción no puede
+//! olvidarse de lo obligatorio ni implementarlo de forma distinta a sus
+//! hermanos.
 
 use instrusim_core::{Stepper, World};
-use instrusim_scpi::error::{ErrorCode, ErrorQueue, ScpiError};
-use instrusim_scpi::format;
-use instrusim_scpi::status::{StatusModel, esr};
-use instrusim_scpi::{Command, CommandTable, parse_message};
+use instrusim_scpi::error::{ErrorQueue, ScpiError};
+use instrusim_scpi::status::StatusModel;
+use instrusim_scpi::{Command, ScpiDevice, handle_message as scpi_handle_message};
 
 /// La identidad que devuelve `*IDN?`.
 ///
@@ -84,192 +86,59 @@ pub trait Instrument: Stepper {
 
 /// Procesa una línea recibida y devuelve la línea a contestar, si procede.
 ///
-/// Un mensaje puede contener varias consultas; sus respuestas se devuelven
-/// unidas por punto y coma, como manda el estándar. Si no hubo ninguna
-/// consulta, no se contesta nada.
-///
-/// Los errores no interrumpen la conversación: se anotan en la cola, se enciende
-/// el bit correspondiente del registro de sucesos y se sigue. Es lo que hace un
-/// instrumento real, y es justo lo que permite al cliente descubrir después qué
-/// salió mal con `SYSTem:ERRor?`.
+/// El despacho de verdad —comandos comunes de IEEE 488.2, `SYSTem:ERRor?`,
+/// mensajes compuestos, cola de errores— vive en `instrusim_scpi::device` y es
+/// común a todo el repositorio. Aquí solo se tiende el puente: [`Instrument`]
+/// necesita el [`World`] para resolver sus comandos y el contrato genérico
+/// [`ScpiDevice`] no lo conoce, así que se empaquetan juntos durante el
+/// despacho.
 pub fn handle_message(
     instrument: &mut dyn Instrument,
     line: &str,
     world: &mut World,
 ) -> Option<String> {
-    let comandos = match parse_message(line) {
-        Ok(c) => c,
-        Err(e) => {
-            anotar(instrument, e);
-            return None;
-        }
-    };
-
-    let mut respuestas: Vec<String> = Vec::new();
-
-    for cmd in &comandos {
-        let resultado = if cmd.is_common() {
-            comando_comun(instrument, cmd)
-        } else if let Some(r) = comando_de_sistema(instrument, cmd) {
-            r
-        } else {
-            instrument.execute(cmd, world)
-        };
-
-        match resultado {
-            Ok(Some(r)) => respuestas.push(r),
-            Ok(None) => {}
-            Err(e) => {
-                anotar(instrument, e);
-                // El estándar manda abandonar el resto del mensaje en cuanto
-                // uno de sus comandos falla: seguir ejecutando lo que venía
-                // detrás de una configuración fallida produciría un estado
-                // incoherente que el cliente no espera.
-                break;
-            }
-        }
-    }
-
-    if respuestas.is_empty() {
-        None
-    } else {
-        Some(respuestas.join(";"))
-    }
+    let mut puente = Puente { instrument, world };
+    scpi_handle_message(&mut puente, line)
 }
 
-/// Anota el error en la cola y enciende el bit de suceso de su familia.
-fn anotar(instrument: &mut dyn Instrument, error: ScpiError) {
-    let bit = error.code.esr_bit();
-    instrument.errors().push(error);
-    instrument.status().set_event(bit);
+/// Une un instrumento con el mundo en el que vive, para que el par cumpla el
+/// contrato [`ScpiDevice`], que es deliberadamente ajeno a la simulación.
+struct Puente<'a> {
+    instrument: &'a mut dyn Instrument,
+    world: &'a mut World,
 }
 
-/// Los comandos comunes de IEEE 488.2, los que empiezan por asterisco.
-fn comando_comun(
-    instrument: &mut dyn Instrument,
-    cmd: &Command,
-) -> Result<Option<String>, ScpiError> {
-    match (cmd.header.as_str(), cmd.query) {
-        ("*IDN", true) => Ok(Some(instrument.identity().idn())),
-
-        ("*RST", false) => {
-            instrument.reset();
-            Ok(None)
-        }
-
-        ("*CLS", false) => {
-            instrument.errors().clear();
-            instrument.status().clear();
-            Ok(None)
-        }
-
-        ("*ESE", false) => {
-            let v = cmd.numeric(0)?.resolve(0.0, 255.0, 0.0);
-            instrument.status().set_event_enable(mascara(v)?);
-            Ok(None)
-        }
-        ("*ESE", true) => {
-            let v = instrument.status().event_enable();
-            Ok(Some(format::nr1(v as i64)))
-        }
-
-        ("*ESR", true) => {
-            let v = instrument.status().read_event();
-            Ok(Some(format::nr1(v as i64)))
-        }
-
-        ("*SRE", false) => {
-            let v = cmd.numeric(0)?.resolve(0.0, 255.0, 0.0);
-            instrument.status().set_service_enable(mascara(v)?);
-            Ok(None)
-        }
-        ("*SRE", true) => {
-            let v = instrument.status().service_enable();
-            Ok(Some(format::nr1(v as i64)))
-        }
-
-        ("*STB", true) => {
-            let hay_errores = !instrument.errors().is_empty();
-            let v = instrument.status().status_byte(hay_errores, false);
-            Ok(Some(format::nr1(v as i64)))
-        }
-
-        // Sin comandos solapados, toda operación termina en el acto, así que
-        // `*OPC` puede encender el bit de inmediato y `*OPC?` contestar ya.
-        ("*OPC", false) => {
-            instrument.status().set_event(esr::OPC);
-            Ok(None)
-        }
-        ("*OPC", true) => Ok(Some("1".to_string())),
-
-        ("*TST", true) => {
-            let r = instrument.self_test();
-            Ok(Some(format::nr1(r)))
-        }
-
-        ("*WAI", false) => Ok(None),
-
-        _ => Err(ScpiError::with_detail(
-            ErrorCode::UndefinedHeader,
-            &cmd.header,
-        )),
-    }
-}
-
-/// Comandos del subsistema `SYSTem` que son iguales en todos los instrumentos.
-///
-/// Devuelve `None` si la cabecera no es de este subsistema, para que el
-/// instrumento la trate como suya.
-fn comando_de_sistema(
-    instrument: &mut dyn Instrument,
-    cmd: &Command,
-) -> Option<Result<Option<String>, ScpiError>> {
-    #[derive(Clone, Copy)]
-    enum Sys {
-        Error,
-        Version,
+impl ScpiDevice for Puente<'_> {
+    fn idn(&self) -> String {
+        self.instrument.identity().idn()
     }
 
-    // La tabla se compila una sola vez en toda la vida del proceso. `OnceLock`
-    // es la inicialización perezosa y segura entre hilos de la librería
-    // estándar: el primer hilo que llegue la construye y el resto reutilizan.
-    static TABLA: OnceLock<CommandTable<Sys>> = OnceLock::new();
-    let tabla = TABLA.get_or_init(|| {
-        CommandTable::from_pairs([
-            ("SYSTem:ERRor[:NEXT]", Sys::Error),
-            ("SYSTem:VERSion", Sys::Version),
-        ])
-    });
-
-    let (accion, _) = tabla.lookup(&cmd.header)?;
-
-    if !cmd.query {
-        // Ambas son solo de consulta; usarlas como orden es error de comando.
-        return Some(Err(ScpiError::with_detail(
-            ErrorCode::UndefinedHeader,
-            &cmd.header,
-        )));
+    fn status(&mut self) -> &mut StatusModel {
+        self.instrument.status()
     }
 
-    Some(match accion {
-        Sys::Error => Ok(Some(instrument.errors().pop().to_string())),
-        // Versión de SCPI a la que se ajusta el instrumento.
-        Sys::Version => Ok(Some("1999.0".to_string())),
-    })
-}
-
-/// Convierte un parámetro numérico en una máscara de ocho bits.
-fn mascara(v: f64) -> Result<u8, ScpiError> {
-    if !(0.0..=255.0).contains(&v) {
-        return Err(ScpiError::new(ErrorCode::DataOutOfRange));
+    fn errors(&mut self) -> &mut ErrorQueue {
+        self.instrument.errors()
     }
-    Ok(v as u8)
+
+    fn reset(&mut self) {
+        self.instrument.reset()
+    }
+
+    fn self_test(&mut self) -> i64 {
+        self.instrument.self_test()
+    }
+
+    fn execute(&mut self, cmd: &Command) -> Result<Option<String>, ScpiError> {
+        self.instrument.execute(cmd, self.world)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use instrusim_scpi::status::stb;
+    use instrusim_scpi::error::ErrorCode;
+    use instrusim_scpi::status::{esr, stb};
     use std::time::Duration;
 
     /// Instrumento mínimo para probar el despacho común sin depender de

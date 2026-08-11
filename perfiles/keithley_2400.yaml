@@ -1,3 +1,17 @@
+# Perfil de ejemplo: fuente-medidora Keithley 2400.
+#
+# El patrón es la cabecera SCPI en notación del estándar: las mayúsculas marcan
+# la abreviatura admitida y los corchetes lo que se puede omitir. Un solo patrón
+# acepta así todas las formas que SCPI declara equivalentes —`SOUR:VOLT`,
+# `source:voltage:level`, `SOURce:VOLTage`— sin tener que enumerarlas.
+#
+# Los argumentos NO van en el patrón: se declaran en `args` y se referencian
+# como `<nombre>`. La forma consulta se marca con `query: true`, sin `?`.
+#
+# Los comandos comunes de IEEE 488.2 (`*IDN?`, `*RST`, `*CLS`, `*ESR?`…) y
+# `SYSTem:ERRor?` no se declaran: los resuelve el motor para todos los
+# dispositivos. `*IDN?` sale del campo `idn` de aquí abajo.
+
 dispositivo:
   modelo: KEITHLEY-2400
   tipo: instrumento
@@ -12,26 +26,36 @@ estado:
   modo: voltage
 
 comandos:
-  - patron: "*IDN?"
-    respuesta: "Keithley,2400,1234567,A1.2"
-  - patron: "*RST"
-    muta:
-      voltaje_fuente: "0.0"
-      corriente_limite: "0.105"
-      output: "false"
-  - patron: "OUTP ON"
-    muta: { output: "true" }
-  - patron: "OUTP OFF"
-    muta: { output: "false" }
-  - patron: "SOUR:VOLT <x>"
-    muta: { voltaje_fuente: "<x>" }
-  - patron: "SOUR:CURR <x>"
-    muta: { corriente_limite: "<x>" }
-  - patron: "MEAS:VOLT?"
+  # `OUTP ON`, `OUTPut:STATe OFF`, `outp 1`… todas valen.
+  - patron: "OUTPut[:STATe]"
+    args: [estado]
+    muta: { output: "<estado>" }
+  - patron: "OUTPut[:STATe]"
+    query: true
+    respuesta: "{output}"
+
+  - patron: "SOURce:VOLTage[:LEVel]"
+    args: [v]
+    muta: { voltaje_fuente: "<v>" }
+  - patron: "SOURce:VOLTage[:LEVel]"
+    query: true
+    respuesta: "{voltaje_fuente}"
+
+  - patron: "SOURce:CURRent[:LEVel]"
+    args: [i]
+    muta: { corriente_limite: "<i>" }
+  - patron: "SOURce:CURRent[:LEVel]"
+    query: true
+    respuesta: "{corriente_limite}"
+
+  - patron: "MEASure:VOLTage[:DC]"
+    query: true
     modelo: medir_voltaje
-  - patron: "MEAS:CURR?"
+  - patron: "MEASure:CURRent[:DC]"
+    query: true
     modelo: medir_corriente
-  - patron: "MEAS:RES?"
+  - patron: "MEASure:RESistance"
+    query: true
     modelo: medir_resistencia
 
 modelos:

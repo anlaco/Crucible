@@ -1,6 +1,6 @@
 # Configuración de cargo-deny: la red de seguridad de la licencia del proyecto.
 #
-# InstruSim se publica como MIT / Apache-2.0. Cualquier dependencia con licencia
+# Crucible se publica como Apache-2.0 (ADR-0001). Cualquier dependencia con licencia
 # copyleft fuerte obligaría a relicenciar el proyecto entero, así que la lista de
 # licencias permitidas es explícita y todo lo demás falla la compilación en CI.
 

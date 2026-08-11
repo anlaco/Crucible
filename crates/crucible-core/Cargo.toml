@@ -11,3 +11,6 @@ serde = { workspace = true }
 serde_yaml = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
+# El SCPI del repositorio. El formato declarativo no reimplementa el protocolo:
+# lo alimenta. Ver ADR-0003.
+instrusim-scpi = { path = "../instrusim-scpi" }

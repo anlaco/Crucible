@@ -5,8 +5,15 @@
 > Crucible absorbió InstruSim el 2026-08-11 (ver
 > [ADR-0003](docs/adr/0003-absorcion-de-instrusim.md)). En el árbol conviven los
 > crates `crucible-*` (formato declarativo, tres capas, runtime TCP) y los
-> `instrusim-*` (motor de señales, SCPI a fondo). **Hay dos implementaciones de
-> SCPI y dos runtimes.** Es deuda declarada, no un descuido.
+> `instrusim-*` (motor de señales, SCPI a fondo).
+>
+> **El SCPI ya es uno solo**, en `instrusim-scpi`. No escribas otro: si un
+> dispositivo necesita hablar SCPI, implementa `ScpiDevice` y deja que
+> `device::handle_message` haga el despacho. Los comandos comunes de IEEE 488.2
+> y `SYSTem:ERRor?` salen gratis y **no deben reimplementarse**.
+>
+> **Siguen conviviendo dos runtimes**, uno por linaje. Es deuda declarada, no un
+> descuido.
 >
 > Las convenciones de abajo describen el linaje `instrusim-*`, que es el que
 > tiene el dominio. Al tocar `crucible-*`, respeta su diseño de tres capas
@@ -53,7 +60,7 @@ resuelve `handle_message` para todos.
 ## Build, Test, and Development Commands
 
 ```bash
-cargo test --workspace                              # 166 tests (ambos linajes)
+cargo test --workspace                              # 176 tests (ambos linajes)
 cargo test -p instrusim-model dmm::tests::mide_la_tension_que_hay_en_sus_bornes
 cargo run --release --bin instrusim                 # 127.0.0.1:5025 y :5026
 python3 scripts/demo.py                             # demostración de punta a punta
@@ -91,4 +98,4 @@ listado de ficheros. Un commit por concepto.
 
 CI (`.github/workflows/ci.yml`) ejecuta tests en Linux y Windows, formato,
 clippy y auditoría de licencias con `cargo-deny` (`deny.toml`): el proyecto es
-MIT/Apache-2.0 y una dependencia copyleft rompe la compilación.
+Apache-2.0 (ADR-0001) y una dependencia copyleft rompe la compilación.

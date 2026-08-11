@@ -13,13 +13,13 @@ impl EvaluadorModelos {
     }
 
     pub fn evaluar(&mut self, modelo: &ModeloDef, estado: &Estado) -> Result<String> {
-        if let Some(cuando) = &modelo.cuando {
-            if !evaluar_guarda(cuando, estado) {
-                if let Some(fb) = &modelo.fallback {
-                    return Ok(evaluar_fallback(fb));
-                }
-                return Ok("0.0".into());
+        if let Some(cuando) = &modelo.cuando
+            && !evaluar_guarda(cuando, estado)
+        {
+            if let Some(fb) = &modelo.fallback {
+                return Ok(evaluar_fallback(fb));
             }
+            return Ok("0.0".into());
         }
 
         match modelo.tipo.as_str() {
@@ -71,19 +71,19 @@ fn evaluar_formula(expr: &str, estado: &Estado, semilla: u64) -> Result<f64> {
 fn evaluar_expr(expr: &str, estado: &Estado, semilla: u64) -> Result<f64> {
     let expr = expr.trim();
 
-    if let Some(pos) = encontrar_operador(expr, '+') {
-        if pos > 0 {
-            let izq = evaluar_expr(&expr[..pos], estado, semilla)?;
-            let der = evaluar_expr(&expr[pos + 1..], estado, semilla)?;
-            return Ok(izq + der);
-        }
+    if let Some(pos) = encontrar_operador(expr, '+')
+        && pos > 0
+    {
+        let izq = evaluar_expr(&expr[..pos], estado, semilla)?;
+        let der = evaluar_expr(&expr[pos + 1..], estado, semilla)?;
+        return Ok(izq + der);
     }
-    if let Some(pos) = encontrar_operador(expr, '-') {
-        if pos > 0 {
-            let izq = evaluar_expr(&expr[..pos], estado, semilla)?;
-            let der = evaluar_expr(&expr[pos + 1..], estado, semilla)?;
-            return Ok(izq - der);
-        }
+    if let Some(pos) = encontrar_operador(expr, '-')
+        && pos > 0
+    {
+        let izq = evaluar_expr(&expr[..pos], estado, semilla)?;
+        let der = evaluar_expr(&expr[pos + 1..], estado, semilla)?;
+        return Ok(izq - der);
     }
     if let Some(pos) = encontrar_operador(expr, '*') {
         let izq = evaluar_expr(&expr[..pos], estado, semilla)?;
@@ -105,9 +105,10 @@ fn evaluar_expr(expr: &str, estado: &Estado, semilla: u64) -> Result<f64> {
         if parts.len() != 2 {
             return Err(CrucibleError::Evaluacion("gauss necesita 2 args".into()));
         }
-        let mu: f64 = parts[0].trim().parse().map_err(|_| {
-            CrucibleError::Evaluacion(format!("gauss: mu inválido: {}", parts[0]))
-        })?;
+        let mu: f64 = parts[0]
+            .trim()
+            .parse()
+            .map_err(|_| CrucibleError::Evaluacion(format!("gauss: mu inválido: {}", parts[0])))?;
         let sigma: f64 = parts[1].trim().parse().map_err(|_| {
             CrucibleError::Evaluacion(format!("gauss: sigma inválido: {}", parts[1]))
         })?;
@@ -144,7 +145,9 @@ fn encontrar_operador(expr: &str, op: char) -> Option<usize> {
 }
 
 fn pseudo_gauss(semilla: u64) -> f64 {
-    let mut s = semilla.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+    let mut s = semilla
+        .wrapping_mul(6364136223846793005)
+        .wrapping_add(1442695040888963407);
     s ^= s >> 29;
     s = s.wrapping_mul(0x9E3779B97F4A7C15);
     s ^= s >> 32;
@@ -203,6 +206,9 @@ mod tests {
         let estado = Estado::new();
         let a = evaluar_expr("gauss(0, 1)", &estado, 42).unwrap();
         let b = evaluar_expr("gauss(0, 1)", &estado, 42).unwrap();
-        assert!((a - b).abs() < 1e-9, "gauss debe ser determinista con misma semilla");
+        assert!(
+            (a - b).abs() < 1e-9,
+            "gauss debe ser determinista con misma semilla"
+        );
     }
 }

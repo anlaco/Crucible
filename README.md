@@ -76,8 +76,9 @@ motor (señales en el tiempo, SCPI a fondo con IEEE 488.2, modelos de DMM y
 fuente, capa de red y CLI). Crucible aportaba el formato, el marco de tres
 capas y el posicionamiento como estándar.
 
-Los dos linajes **conviven pero todavía no están fusionados**: hay dos
-implementaciones de SCPI en el árbol y dos runtimes. Ver
+**El SCPI ya está unificado**: hay uno solo, en `instrusim-scpi`, y lo comparten
+los dispositivos descritos en YAML y los instrumentos escritos en Rust. Siguen
+conviviendo dos runtimes, que es el siguiente paso. Ver
 [ADR-0003](docs/adr/0003-absorcion-de-instrusim.md) para el plan de
 consolidación y qué queda por hacer.
 

@@ -41,6 +41,7 @@ name = "crucible-core"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "instrusim-scpi",
  "serde",
  "serde_yaml",
  "thiserror",

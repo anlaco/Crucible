@@ -22,21 +22,30 @@ async fn main() -> anyhow::Result<()> {
         let banco = Banco::from_yaml(&text)?;
         let base_default = PathBuf::from(".");
         let base = path.parent().unwrap_or(&base_default);
-        let dispositivos = banco.cargar_dispositivos(base);
+        // Un perfil roto tumba el banco entero: arrancar a medias daría
+        // resultados falsos en vez de un fallo visible.
+        let dispositivos = banco.cargar_dispositivos(base)?;
 
         if dispositivos.is_empty() {
-            eprintln!("error: no se cargaron dispositivos");
+            eprintln!("error: el banco no declara ningún dispositivo");
             std::process::exit(1);
         }
 
         let mut handles = Vec::new();
         for (inst, disp) in dispositivos {
             if inst.transporte.tipo != "tcp" {
-                eprintln!("aviso: transporte '{}' no soportado en MVP, saltando {}", inst.transporte.tipo, inst.id);
+                eprintln!(
+                    "aviso: transporte '{}' no soportado en MVP, saltando {}",
+                    inst.transporte.tipo, inst.id
+                );
                 continue;
             }
             let puerto = inst.transporte.puerto.unwrap_or(5025);
-            let host = inst.transporte.host.clone().unwrap_or_else(|| "127.0.0.1".into());
+            let host = inst
+                .transporte
+                .host
+                .clone()
+                .unwrap_or_else(|| "127.0.0.1".into());
             let id = inst.id.clone();
             handles.push(tokio::spawn(async move {
                 if let Err(e) = servir_tcp(disp, &host, puerto).await {
@@ -44,7 +53,11 @@ async fn main() -> anyhow::Result<()> {
                 }
             }));
         }
-        eprintln!("Crucible banco '{}' levantado ({} dispositivos)", banco.banco.nombre, handles.len());
+        eprintln!(
+            "Crucible banco '{}' levantado ({} dispositivos)",
+            banco.banco.nombre,
+            handles.len()
+        );
         for h in handles {
             let _ = h.await;
         }
@@ -52,7 +65,7 @@ async fn main() -> anyhow::Result<()> {
         let path = PathBuf::from(&args[1]);
         let perfil = Perfil::from_file(&path)?;
         let modelo = perfil.dispositivo.modelo.clone();
-        let disp = crucible_core::Dispositivo::from_perfil(perfil);
+        let disp = crucible_core::Dispositivo::from_perfil(perfil)?;
         let puerto: u16 = if args.len() > 2 {
             args[2].parse().unwrap_or(5025)
         } else {
@@ -75,7 +88,9 @@ async fn servir_tcp(
 
     loop {
         let (stream, peer) = listener.accept().await?;
-        let mut disp_clone = disp.clonar();
+        // Cada conexión habla con su propia copia del dispositivo. El perfil ya
+        // se validó al cargarlo, así que clonar no puede fallar por otra causa.
+        let mut disp_clone = disp.clonar()?;
         tokio::spawn(async move {
             eprintln!("conexion desde {}", peer);
             let (reader, mut writer) = stream.into_split();
@@ -89,28 +104,21 @@ async fn servir_tcp(
                     Err(_) => break,
                 };
                 let _ = n;
-                let msg = line.trim_end_matches(|c| c == '\r' || c == '\n');
+                let msg = line.trim_end_matches(['\r', '\n']);
                 if msg.is_empty() {
                     continue;
                 }
-                match disp_clone.procesar(msg) {
-                    Ok(resp) => {
-                        if !resp.is_empty() {
-                            let out = if msg.ends_with('?') {
-                                format!("{}\n", resp)
-                            } else {
-                                String::new()
-                            };
-                            if !out.is_empty() {
-                                if writer.write_all(out.as_bytes()).await.is_err() {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        eprintln!("error procesando '{}': {}", msg, e);
-                    }
+                // El motor SCPI ya sabe si el mensaje llevaba alguna consulta;
+                // no hay que adivinarlo mirando si la línea acaba en '?', que
+                // fallaba con los compuestos: "SOUR:VOLT?;:OUTP ON" lleva
+                // consulta y no acaba en '?'.
+                if let Some(resp) = disp_clone.procesar(msg)
+                    && writer
+                        .write_all(format!("{resp}\n").as_bytes())
+                        .await
+                        .is_err()
+                {
+                    break;
                 }
             }
             eprintln!("conexion cerrada ({})", peer);
