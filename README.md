@@ -34,6 +34,9 @@ muestrear a 1 GS/s.
 ## Documentación
 
 - [Plan de arquitectura y fases](docs/PLAN.md)
+- [Herencia de Crucible](docs/estandar/README.md) — el proyecto hermano que se absorbió aquí:
+  propuestas de formato de perfil, topología de banco y el razonamiento de por qué esto puede
+  ser un estándar y no solo una herramienta. Propuestas, no especificación.
 
 ## Licencia
 
