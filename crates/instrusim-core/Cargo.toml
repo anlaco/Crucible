@@ -1,0 +1,11 @@
+[package]
+name = "instrusim-core"
+# `.workspace = true` significa "toma este valor del Cargo.toml raíz".
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Núclea de simulación de InstruSim: tiempo, señales, mundo, triggers"
+
+[dependencies]
+# Vacio por ahora. El núcleo no dependerá de nada externo si podemos evitarlo.

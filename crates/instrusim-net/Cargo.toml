@@ -1,0 +1,13 @@
+[package]
+name = "instrusim-net"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Frente de protocolo de InstruSim: socket raw sobre TCP, el mismo que exponen los instrumentos LXI"
+
+[dependencies]
+instrusim-model = { path = "../instrusim-model" }
+
+[dev-dependencies]
+instrusim-core = { path = "../instrusim-core" }

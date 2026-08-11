@@ -18,6 +18,16 @@ diferencia: un dispositivo de test es, en el 90 % de los casos, una
 un registro, muta su estado, devuelve algo) — no física continua.
 Empezamos por ahí.
 
+Un dispositivo real no soporta clientes: expone protocolos. Crucible hace
+lo mismo, así que funciona con pyvisa, LabVIEW, MATLAB, C# o un simple
+`netcat` sin código específico para ninguno:
+
+```
+cliente ──VISA──► TCPIP0::127.0.0.1::5025::SOCKET
+                  *IDN?              → Keithley,2400,0,1.0
+                  MEAS:VOLT:DC?      → +5.000018E+00
+```
+
 ## Tres capas, no una
 
 Un banco de test no es solo instrumentos SCPI por TCP. Es una mezcla
@@ -32,6 +42,14 @@ Un Keithley 2400 es el mismo dispositivo hable SCPI por GPIB, TCP o
 USB-TMC. Una cámara térmica habla Modbus, no SCPI. Un fixture custom
 habla un protocolo serial ad-hoc. El formato los describe a todos; el
 runtime de referencia los sirve.
+
+## El banco entero, no el instrumento aislado
+
+Los nodos del banco no guardan números sino **señales evaluables en el
+tiempo**: el motor corre a 1 kHz y aun así un osciloscopio puede muestrear
+a 1 GS/s. Eso permite modelar dispositivos acoplados por señales reales y
+disparados entre sí — un banco, no una colección de simuladores
+independientes. Es el hueco que PyVISA-sim no cubre.
 
 ## Qué es y qué no es
 
@@ -52,19 +70,35 @@ runtime de referencia los sirve.
 
 ## Estado
 
-Inicialización (repo + spec del formato). Ver [`docs/roadmap.md`](docs/roadmap.md).
-El diseño del formato está en [`docs/diseno/`](docs/diseno/):
-- [`arquitectura.md`](docs/diseno/arquitectura.md) — visión general.
-- [`formato-de-perfil.md`](docs/diseno/formato-de-perfil.md) — cómo se
-  describe un dispositivo (con ejemplos SCPI, Modbus y serial custom).
-- [`topologia-de-banco.md`](docs/diseno/topologia-de-banco.md) — cómo se
-  compone un banco (varios dispositivos + DUT, multi-transporte).
+**En desarrollo, y con dos linajes recién unidos.** El 2026-08-11 se
+absorbió **InstruSim**, un proyecto hermano con la misma tesis: aportó el
+motor (señales en el tiempo, SCPI a fondo con IEEE 488.2, modelos de DMM y
+fuente, capa de red y CLI). Crucible aportaba el formato, el marco de tres
+capas y el posicionamiento como estándar.
+
+Los dos linajes **conviven pero todavía no están fusionados**: hay dos
+implementaciones de SCPI en el árbol y dos runtimes. Ver
+[ADR-0003](docs/adr/0003-absorcion-de-instrusim.md) para el plan de
+consolidación y qué queda por hacer.
+
+- Formato: [`docs/diseno/`](docs/diseno/) — [arquitectura](docs/diseno/arquitectura.md),
+  [perfil de dispositivo](docs/diseno/formato-de-perfil.md) (ejemplos SCPI,
+  Modbus y serial custom), [topología de banco](docs/diseno/topologia-de-banco.md).
+- Motor: [`docs/PLAN.md`](docs/PLAN.md) — arquitectura y fases del linaje InstruSim.
+- Roadmap: [`docs/roadmap.md`](docs/roadmap.md).
 
 Decisiones de fondo en [`docs/adr/`](docs/adr/):
 - [`0001`](docs/adr/0001-estandar-declarativo-apache-separado-de-anvil.md)
   — estándar declarativo, Apache, separado de Anvil.
 - [`0002`](docs/adr/0002-separacion-de-capas-transporte-protocolo-dispositivo.md)
   — separación de capas transporte / protocolo / dispositivo.
+- [`0003`](docs/adr/0003-absorcion-de-instrusim.md)
+  — absorción de InstruSim y plan de consolidación.
+
+## Requisitos
+
+- Rust estable (1.90 o superior)
+- Python con `pyvisa` para la suite de integración
 
 ## Licencia
 

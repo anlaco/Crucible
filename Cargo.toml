@@ -1,17 +1,23 @@
 [workspace]
-resolver = "2"
-members = [
-    "crates/crucible-core",
-    "crates/crucible",
-]
+# resolver = "3" es el resolvedor de dependencias moderno; requiere edición 2024.
+resolver = "3"
+# Glob: cualquier carpeta dentro de crates/ es un miembro del workspace.
+# Así no hay que tocar este fichero cada vez que se añade un crate.
+members = ["crates/*"]
 
+# Valores que heredan todos los crates, para no repetirlos en cada uno.
 [workspace.package]
-version = "0.1.0"
-edition = "2021"
-license = "Apache-2.0"
-authors = ["ANLACO"]
-description = "Estándar abierto para describir y simular bancos de test"
-repository = "https://github.com/ANLACO/Crucible"
+version      = "0.1.0"
+edition      = "2024"
+rust-version = "1.90"
+# Apache-2.0 en todo el workspace por decisión de producto, no por comodidad:
+# Crucible quiere adoptarse como referencia y linkarse en código ajeno
+# (ADR-0001). Los crates que vienen de InstruSim eran MIT/Apache dual y se
+# unifican aquí; mismo autor, sin contribuciones de terceros.
+license      = "Apache-2.0"
+authors      = ["ANLACO <anlaco@proton.me>"]
+description  = "Estándar abierto para describir y simular bancos de test"
+repository   = "https://github.com/ANLACO/Crucible"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

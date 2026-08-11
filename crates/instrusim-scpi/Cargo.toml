@@ -1,0 +1,9 @@
+[package]
+name = "instrusim-scpi"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Capa SCPI-99 / IEEE 488.2 de InstruSim: análisis de mensajes, patrones de cabecera, cola de errores y registros de estado"
+
+[dependencies]
