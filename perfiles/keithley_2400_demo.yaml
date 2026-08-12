@@ -1,0 +1,94 @@
+# Perfil de demo: el Keithley 2400 **ya configurado**, para el smoke con Anvil.
+#
+# Es `keithley_2400.yaml` con una sola diferencia: el estado inicial. Aquí el
+# instrumento arranca con la salida puesta a 4,5 V, como si alguien lo hubiera
+# dejado configurado antes de que llegue el secuenciador.
+#
+# Por qué hace falta un perfil aparte:
+#
+#   El paso `medir_voltaje_scpi` de Anvil abre su propia conexión TCP y manda
+#   una sola cosa: `MEASURE:VOLTAGE?`. No configura nada antes. Contra el perfil
+#   de referencia —que arranca en reposo, con `output: false`— la respuesta es
+#   `0.0`, que cae fuera del límite 4,0–5,0 de `ejemplos/scpi.yaml` y el paso
+#   sale en `fallo`.
+#
+#   El perfil de referencia hace bien en arrancar apagado: un instrumento recién
+#   encendido está en reposo. El que tiene que cambiar es el escenario, no el
+#   modelo del aparato. De ahí este fichero.
+#
+# Smoke completo, tres terminales, desde el directorio de cada repo:
+#
+#   1) Crucible/  ./target/debug/crucible perfiles/keithley_2400_demo.yaml
+#   2) Anvil/     wasmtime -S cli -S tcp=y -S inherit-network=y \
+#                   target/wasm32-wasip2/debug/ejecutor_pasos.wasm
+#   3) Anvil/     wasmtime -S cli -S tcp=y -S inherit-network=y --dir=. \
+#                   target/wasm32-wasip2/debug/anvil-guest.wasm ejemplos/scpi.yaml
+#
+#   === scpi_demo: paso ===
+#     [paso] medir_voltaje_scpi: SCPI medido: 4.501385029307777 V
+#
+# Verificado el 12/08/2026. El decimal no es fijo: el modelo de medida añade
+# ruido gaussiano determinista por semilla.
+
+dispositivo:
+  modelo: KEITHLEY-2400
+  tipo: instrumento
+  idn: "Keithley,2400,1234567,A1.2"
+
+protocolo: scpi
+
+# La única diferencia con el perfil de referencia.
+estado:
+  voltaje_fuente: 4.5
+  corriente_limite: 0.105
+  output: true
+  modo: voltage
+
+comandos:
+  - patron: "OUTPut[:STATe]"
+    args: [estado]
+    muta: { output: "<estado>" }
+  - patron: "OUTPut[:STATe]"
+    query: true
+    respuesta: "{output}"
+
+  - patron: "SOURce:VOLTage[:LEVel]"
+    args: [v]
+    muta: { voltaje_fuente: "<v>" }
+  - patron: "SOURce:VOLTage[:LEVel]"
+    query: true
+    respuesta: "{voltaje_fuente}"
+
+  - patron: "SOURce:CURRent[:LEVel]"
+    args: [i]
+    muta: { corriente_limite: "<i>" }
+  - patron: "SOURce:CURRent[:LEVel]"
+    query: true
+    respuesta: "{corriente_limite}"
+
+  - patron: "MEASure:VOLTage[:DC]"
+    query: true
+    modelo: medir_voltaje
+  - patron: "MEASure:CURRent[:DC]"
+    query: true
+    modelo: medir_corriente
+  - patron: "MEASure:RESistance"
+    query: true
+    modelo: medir_resistencia
+
+modelos:
+  medir_voltaje:
+    tipo: formula
+    cuando: { output: "true" }
+    expr: "voltaje_fuente + gauss(0, 0.001)"
+    fallback: "0.0"
+  medir_corriente:
+    tipo: formula
+    cuando: { output: "true" }
+    expr: "voltaje_fuente / 1000.0"
+    fallback: "0.0"
+  medir_resistencia:
+    tipo: formula
+    cuando: { output: "true" }
+    expr: "1000.0"
+    fallback: "0.0"

@@ -68,6 +68,42 @@ independientes. Es el hueco que PyVISA-sim no cubre.
   Apache-2.0, consumible por cualquier secuenciador. Anvil será su primer
   cliente, no su dueño.
 
+## Un secuenciador real midiendo contra un instrumento que no existe
+
+Verificado el 2026-08-12. [Anvil](https://github.com/anlaco/anvil) corre su
+secuencia de smoke SCPI sin saber que al otro lado no hay un Keithley:
+
+```
+=== scpi_demo: paso ===
+  [paso] medir_voltaje_scpi: SCPI medido: 4.501385029307777 V
+```
+
+Tres terminales. En este repo:
+
+```sh
+cargo build
+./target/debug/crucible perfiles/keithley_2400_demo.yaml
+```
+
+Y en el de Anvil, con los guests ya compilados
+(`cargo build --target wasm32-wasip2 -p ejecutor_pasos -p motor`):
+
+```sh
+wasmtime -S cli -S tcp=y -S inherit-network=y \
+  target/wasm32-wasip2/debug/ejecutor_pasos.wasm
+
+wasmtime -S cli -S tcp=y -S inherit-network=y --dir=. \
+  target/wasm32-wasip2/debug/anvil-guest.wasm ejemplos/scpi.yaml
+```
+
+El perfil de la demo es
+[`perfiles/keithley_2400_demo.yaml`](perfiles/keithley_2400_demo.yaml): el
+Keithley de referencia con el estado inicial ya configurado, porque el paso de
+Anvil mide sin configurar nada antes. El fichero explica por qué.
+
+Nadie escribió código para que estas dos piezas se entendieran: Anvil manda
+`MEASURE:VOLTAGE?` porque es SCPI, y Crucible responde porque es SCPI.
+
 ## Estado
 
 **En desarrollo, y con dos linajes recién unidos.** El 2026-08-11 se
