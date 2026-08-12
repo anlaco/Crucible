@@ -1,7 +1,9 @@
 use crucible_core::{Banco, Perfil};
 use std::path::PathBuf;
+use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::TcpListener;
+use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -86,11 +88,24 @@ async fn servir_tcp(
     let listener = TcpListener::bind(&addr).await?;
     eprintln!("escuchando en {}", addr);
 
+    // El dispositivo es uno solo y lo comparten todas las conexiones: modela un
+    // aparato físico único, y un instrumento real no vuelve a sus valores de
+    // fábrica porque alguien cierre la sesión. Configúralo, desconéctate,
+    // vuelve, y sigue como lo dejaste. Antes se clonaba por conexión y cada
+    // cliente hablaba con una copia virgen.
+    //
+    // El mutex es el de tokio, no el de std: su guard es Send, así que la
+    // conexión sigue siendo spawnable aunque algún día haya un await dentro de
+    // la sección crítica, y un pánico no envenena el instrumento para las demás
+    // conexiones. Se bloquea por mensaje y se suelta antes de escribir en el
+    // socket: un cliente lento no puede congelar al resto. Las conexiones
+    // concurrentes se serializan, que es justo lo que hace un aparato de
+    // verdad.
+    let disp = Arc::new(Mutex::new(disp));
+
     loop {
         let (stream, peer) = listener.accept().await?;
-        // Cada conexión habla con su propia copia del dispositivo. El perfil ya
-        // se validó al cargarlo, así que clonar no puede fallar por otra causa.
-        let mut disp_clone = disp.clonar()?;
+        let disp = Arc::clone(&disp);
         tokio::spawn(async move {
             eprintln!("conexion desde {}", peer);
             let (reader, mut writer) = stream.into_split();
@@ -112,7 +127,8 @@ async fn servir_tcp(
                 // no hay que adivinarlo mirando si la línea acaba en '?', que
                 // fallaba con los compuestos: "SOUR:VOLT?;:OUTP ON" lleva
                 // consulta y no acaba en '?'.
-                if let Some(resp) = disp_clone.procesar(msg)
+                let resp = disp.lock().await.procesar(msg);
+                if let Some(resp) = resp
                     && writer
                         .write_all(format!("{resp}\n").as_bytes())
                         .await

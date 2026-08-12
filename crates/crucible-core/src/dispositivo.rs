@@ -42,6 +42,12 @@ impl Dispositivo {
         &mut self.scpi.estado
     }
 
+    /// Arranca una copia independiente con el mismo perfil y el mismo estado.
+    ///
+    /// No se usa para aislar conexiones TCP entre sí: un dispositivo servido
+    /// por `crucible` es uno solo, compartido, porque modela un aparato físico
+    /// único. Esto es para levantar un segundo dispositivo equivalente en otro
+    /// sitio (otro puerto, otro test), no una copia por cliente.
     pub fn clonar(&self) -> Result<Dispositivo> {
         let mut nuevo = Dispositivo::from_perfil(self.scpi.perfil().clone())?;
         *nuevo.estado_mut() = self.scpi.estado.clone();

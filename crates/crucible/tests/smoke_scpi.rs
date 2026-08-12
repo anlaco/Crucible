@@ -153,6 +153,40 @@ async fn smoke_scpi_de_verdad() {
     assert_eq!(s.preguntar("*IDN?").await, "Keithley,2400,1234567,A1.2");
 }
 
+/// El estado sobrevive a la desconexión: un instrumento real no vuelve a
+/// fábrica porque el cliente cierre el socket.
+#[tokio::test]
+async fn el_estado_sobrevive_a_la_reconexion() {
+    let disp = levantar_runtime().await;
+    let puerto = 15528u16;
+    servir_en_puerto(disp, puerto).await;
+    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+
+    {
+        let mut s = Sesion::conectar(puerto).await;
+        s.enviar("SOUR:VOLT 4.5").await;
+        s.enviar("OUTP ON").await;
+        let volt = s.preguntar("MEAS:VOLT?").await;
+        let volt_f: f64 = volt.parse().unwrap();
+        assert!(
+            (volt_f - 4.5).abs() < 0.05,
+            "voltaje debe ser ~4.5, fue {}",
+            volt_f
+        );
+        // se cierra al salir de este bloque
+    }
+
+    let mut s2 = Sesion::conectar(puerto).await;
+    let volt = s2.preguntar("MEAS:VOLT?").await;
+    let volt_f: f64 = volt.parse().unwrap();
+    assert!(
+        (volt_f - 4.5).abs() < 0.05,
+        "el estado no sobrevivió a la reconexión: voltaje debe ser ~4.5, fue {}",
+        volt_f
+    );
+    assert_eq!(s2.preguntar("SOUR:VOLT?").await, "4.5");
+}
+
 #[tokio::test]
 async fn smoke_output_off_mide_cero() {
     let disp = levantar_runtime().await;
