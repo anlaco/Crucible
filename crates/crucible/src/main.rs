@@ -1,9 +1,6 @@
+use crucible::servir_tcp;
 use crucible_core::{Banco, Perfil};
 use std::path::PathBuf;
-use std::sync::Arc;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::net::TcpListener;
-use tokio::sync::Mutex;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -77,67 +74,4 @@ async fn main() -> anyhow::Result<()> {
         servir_tcp(disp, "127.0.0.1", puerto).await?;
     }
     Ok(())
-}
-
-async fn servir_tcp(
-    disp: crucible_core::Dispositivo,
-    host: &str,
-    puerto: u16,
-) -> anyhow::Result<()> {
-    let addr = format!("{}:{}", host, puerto);
-    let listener = TcpListener::bind(&addr).await?;
-    eprintln!("escuchando en {}", addr);
-
-    // El dispositivo es uno solo y lo comparten todas las conexiones: modela un
-    // aparato físico único, y un instrumento real no vuelve a sus valores de
-    // fábrica porque alguien cierre la sesión. Configúralo, desconéctate,
-    // vuelve, y sigue como lo dejaste. Antes se clonaba por conexión y cada
-    // cliente hablaba con una copia virgen.
-    //
-    // El mutex es el de tokio, no el de std: su guard es Send, así que la
-    // conexión sigue siendo spawnable aunque algún día haya un await dentro de
-    // la sección crítica, y un pánico no envenena el instrumento para las demás
-    // conexiones. Se bloquea por mensaje y se suelta antes de escribir en el
-    // socket: un cliente lento no puede congelar al resto. Las conexiones
-    // concurrentes se serializan, que es justo lo que hace un aparato de
-    // verdad.
-    let disp = Arc::new(Mutex::new(disp));
-
-    loop {
-        let (stream, peer) = listener.accept().await?;
-        let disp = Arc::clone(&disp);
-        tokio::spawn(async move {
-            eprintln!("conexion desde {}", peer);
-            let (reader, mut writer) = stream.into_split();
-            let mut reader = BufReader::new(reader);
-            let mut line = String::new();
-            loop {
-                line.clear();
-                let n = match reader.read_line(&mut line).await {
-                    Ok(0) => break,
-                    Ok(n) => n,
-                    Err(_) => break,
-                };
-                let _ = n;
-                let msg = line.trim_end_matches(['\r', '\n']);
-                if msg.is_empty() {
-                    continue;
-                }
-                // El motor SCPI ya sabe si el mensaje llevaba alguna consulta;
-                // no hay que adivinarlo mirando si la línea acaba en '?', que
-                // fallaba con los compuestos: "SOUR:VOLT?;:OUTP ON" lleva
-                // consulta y no acaba en '?'.
-                let resp = disp.lock().await.procesar(msg);
-                if let Some(resp) = resp
-                    && writer
-                        .write_all(format!("{resp}\n").as_bytes())
-                        .await
-                        .is_err()
-                {
-                    break;
-                }
-            }
-            eprintln!("conexion cerrada ({})", peer);
-        });
-    }
 }

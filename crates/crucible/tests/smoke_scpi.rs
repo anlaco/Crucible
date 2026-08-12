@@ -1,49 +1,26 @@
+use crucible::{aceptar_conexiones, bind_tcp};
 use crucible_core::{Dispositivo, Perfil};
-use std::sync::Arc;
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::net::{TcpListener, TcpStream};
-use tokio::sync::Mutex;
+use tokio::net::TcpStream;
 
 const PERFIL_KEITHLEY: &str = include_str!("../../../perfiles/keithley_2400.yaml");
 
-async fn levantar_runtime() -> Arc<Mutex<Dispositivo>> {
+fn levantar_dispositivo() -> Dispositivo {
     let perfil = Perfil::from_yaml(PERFIL_KEITHLEY).unwrap();
-    let disp = Dispositivo::from_perfil(perfil).unwrap();
-    Arc::new(Mutex::new(disp))
+    Dispositivo::from_perfil(perfil).unwrap()
 }
 
-async fn servir_en_puerto(disp: Arc<Mutex<Dispositivo>>, puerto: u16) {
-    let listener = TcpListener::bind(("127.0.0.1", puerto)).await.unwrap();
-    tokio::spawn(async move {
-        loop {
-            let (stream, _) = listener.accept().await.unwrap();
-            let disp = disp.clone();
-            tokio::spawn(async move {
-                let (reader, mut writer) = stream.into_split();
-                let mut reader = BufReader::new(reader);
-                let mut line = String::new();
-                loop {
-                    line.clear();
-                    if reader.read_line(&mut line).await.unwrap() == 0 {
-                        break;
-                    }
-                    let msg = line.trim_end_matches(['\r', '\n']);
-                    if msg.is_empty() {
-                        continue;
-                    }
-                    let mut d = disp.lock().await;
-                    // El motor dice si hubo consulta; no se adivina por el '?'
-                    // final, que falla con los mensajes compuestos.
-                    if let Some(resp) = d.procesar(msg) {
-                        writer
-                            .write_all(format!("{resp}\n").as_bytes())
-                            .await
-                            .unwrap();
-                    }
-                }
-            });
-        }
-    });
+/// Levanta el servidor de verdad —`crucible::aceptar_conexiones`, el mismo que
+/// usa el binario— en un puerto que elige el sistema, y devuelve ese puerto.
+///
+/// Puerto 0 en vez de uno fijo: los fijos se pisan si dos corridas de test se
+/// solapan, y el resto del repo ya evita eso.
+async fn levantar_runtime() -> u16 {
+    let disp = levantar_dispositivo();
+    let listener = bind_tcp("127.0.0.1", 0).await.unwrap();
+    let puerto = listener.local_addr().unwrap().port();
+    tokio::spawn(aceptar_conexiones(listener, disp));
+    puerto
 }
 
 struct Sesion {
@@ -90,10 +67,7 @@ impl Sesion {
 
 #[tokio::test]
 async fn smoke_keithley_completo() {
-    let disp = levantar_runtime().await;
-    let puerto = 15525u16;
-    servir_en_puerto(disp, puerto).await;
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    let puerto = levantar_runtime().await;
 
     let mut s = Sesion::conectar(puerto).await;
 
@@ -128,10 +102,7 @@ async fn smoke_keithley_completo() {
 /// lugar de tumbar la conversación.
 #[tokio::test]
 async fn smoke_scpi_de_verdad() {
-    let disp = levantar_runtime().await;
-    let puerto = 15527u16;
-    servir_en_puerto(disp, puerto).await;
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    let puerto = levantar_runtime().await;
 
     let mut s = Sesion::conectar(puerto).await;
 
@@ -157,10 +128,7 @@ async fn smoke_scpi_de_verdad() {
 /// fábrica porque el cliente cierre el socket.
 #[tokio::test]
 async fn el_estado_sobrevive_a_la_reconexion() {
-    let disp = levantar_runtime().await;
-    let puerto = 15528u16;
-    servir_en_puerto(disp, puerto).await;
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    let puerto = levantar_runtime().await;
 
     {
         let mut s = Sesion::conectar(puerto).await;
@@ -189,10 +157,7 @@ async fn el_estado_sobrevive_a_la_reconexion() {
 
 #[tokio::test]
 async fn smoke_output_off_mide_cero() {
-    let disp = levantar_runtime().await;
-    let puerto = 15526u16;
-    servir_en_puerto(disp, puerto).await;
-    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    let puerto = levantar_runtime().await;
 
     let mut s = Sesion::conectar(puerto).await;
 

@@ -60,7 +60,7 @@ resuelve `handle_message` para todos.
 ## Build, Test, and Development Commands
 
 ```bash
-cargo test --workspace                              # 176 tests (ambos linajes)
+cargo test --workspace                              # 177 tests (ambos linajes)
 cargo test -p instrusim-model dmm::tests::mide_la_tension_que_hay_en_sus_bornes
 cargo run --release --bin instrusim                 # 127.0.0.1:5025 y :5026
 python3 scripts/demo.py                             # demostración de punta a punta
