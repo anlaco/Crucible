@@ -56,7 +56,7 @@ pub struct Comando {
     #[serde(default)]
     pub query: bool,
 
-    #[serde(default)]
+    #[serde(default, deserialize_with = "mapa_de_textos")]
     pub muta: Option<HashMap<String, String>>,
     /// Respuesta literal, o plantilla: `{variable}` toma del estado y `<arg>`
     /// del argumento.
@@ -87,12 +87,16 @@ pub struct RegistroModbus {
 pub struct ModeloDef {
     #[serde(rename = "tipo")]
     pub tipo: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "mapa_de_textos")]
     pub cuando: Option<HashMap<String, String>>,
     #[serde(default)]
     pub expr: Option<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "texto_opcional")]
     pub fallback: Option<String>,
+    /// Cómo se escribe el número de la respuesta: `entero`, `fijo:N` o
+    /// `cientifico:N`. Sin él, el formato de siempre (`1.0`, `4.5013…`).
+    #[serde(default)]
+    pub formato: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -132,6 +136,32 @@ impl Perfil {
                 )));
             }
             cmd.validar_patron()?;
+            if cmd.query && cmd.respuesta.is_none() && cmd.modelo.is_none() {
+                return Err(CrucibleError::PerfilInvalido(format!(
+                    "la consulta '{}' no tiene 'respuesta' ni 'modelo': no sabría qué contestar",
+                    cmd.patron
+                )));
+            }
+        }
+        for (nombre, modelo) in &self.modelos {
+            if modelo.tipo != "formula" {
+                return Err(CrucibleError::PerfilInvalido(format!(
+                    "modelo '{nombre}': tipo '{}' no soportado; el único que existe es 'formula'",
+                    modelo.tipo
+                )));
+            }
+            let Some(expr) = &modelo.expr else {
+                return Err(CrucibleError::PerfilInvalido(format!(
+                    "modelo '{nombre}': falta 'expr'"
+                )));
+            };
+            if let Some(f) = &modelo.formato {
+                crate::modelo::Formato::parse(f).map_err(|e| {
+                    CrucibleError::PerfilInvalido(format!("modelo '{nombre}': {e}"))
+                })?;
+            }
+            crate::modelo::validar_formula(expr)
+                .map_err(|e| CrucibleError::PerfilInvalido(format!("modelo '{nombre}': {e}")))?;
         }
         Ok(())
     }
@@ -180,6 +210,16 @@ impl Comando {
 }
 
 impl ValorRaw {
+    /// El escalar tal como lo escribiría quien edita el YAML.
+    pub fn a_texto(&self) -> String {
+        match self {
+            ValorRaw::Float(f) => f.to_string(),
+            ValorRaw::Int(i) => i.to_string(),
+            ValorRaw::Bool(b) => b.to_string(),
+            ValorRaw::Str(s) => s.clone(),
+        }
+    }
+
     pub fn to_valor(&self) -> crate::estado::Valor {
         match self {
             ValorRaw::Float(f) => crate::estado::Valor::Float(*f),
@@ -188,4 +228,26 @@ impl ValorRaw {
             ValorRaw::Str(s) => crate::estado::Valor::Str(s.clone()),
         }
     }
+}
+
+/// Acepta cualquier escalar donde el formato guarda texto.
+///
+/// Quien escribe un perfil pone `fallback: 0.0` o `cuando: { output: true }`
+/// sin comillas, y es razonable. Exigir `String` a serde hacía fallar la carga
+/// con un «invalid type: floating point» que no dice qué campo corregir.
+fn texto_opcional<'de, D>(d: D) -> std::result::Result<Option<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Ok(Option::<ValorRaw>::deserialize(d)?.map(|v| v.a_texto()))
+}
+
+pub(crate) fn mapa_de_textos<'de, D>(
+    d: D,
+) -> std::result::Result<Option<HashMap<String, String>>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    Ok(Option::<HashMap<String, ValorRaw>>::deserialize(d)?
+        .map(|m| m.into_iter().map(|(k, v)| (k, v.a_texto())).collect()))
 }

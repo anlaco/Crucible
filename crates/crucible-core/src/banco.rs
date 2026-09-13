@@ -21,7 +21,7 @@ pub struct InstanciaDispositivo {
     pub id: String,
     pub perfil: String,
     pub transporte: Transporte,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "crate::perfil::mapa_de_textos")]
     pub estado_inicial: Option<std::collections::HashMap<String, String>>,
 }
 

@@ -325,6 +325,21 @@ modelos:
     }
 
     #[test]
+    fn un_argumento_opcional_ausente_no_toca_el_estado() {
+        let mut d = dispositivo();
+        d.procesar("SOUR:VOLT 2.0");
+        d.procesar("SOUR:VOLT");
+        assert_eq!(d.estado.get_float("voltaje_fuente"), Some(2.0));
+    }
+
+    #[test]
+    fn outp_1_enciende_igual_que_outp_on() {
+        let mut d = dispositivo();
+        d.procesar("SOUR:VOLT 4.0;:OUTP 1");
+        assert_eq!(d.procesar("MEAS:VOLT?").as_deref(), Some("4.0"));
+    }
+
+    #[test]
     fn el_modelo_respeta_su_condicion() {
         let mut d = dispositivo();
         d.procesar("SOUR:VOLT 4.0");

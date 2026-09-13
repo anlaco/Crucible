@@ -56,6 +56,13 @@ pub fn aplicar_mutacion(
     args: &HashMap<String, String>,
 ) {
     for (clave, expr) in muta {
+        // Un argumento opcional que no llegó (`CONF:VOLT` sin rango) deja la
+        // variable como estaba. Antes se guardaba el texto «<rango>» tal cual y
+        // la siguiente medida fallaba sin que se viera por qué.
+        let e = expr.trim();
+        if e.starts_with('<') && e.ends_with('>') && !args.contains_key(&e[1..e.len() - 1]) {
+            continue;
+        }
         let valor = resolver_expr(expr, args);
         // `ON`/`OFF` llegan así desde SCPI y son booleanos, no texto.
         let valor_norm = match valor.to_ascii_uppercase().as_str() {
