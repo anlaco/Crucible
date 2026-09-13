@@ -1,0 +1,104 @@
+name: Release
+
+# Construye los instaladores. En cada ejecución quedan como artefactos de la
+# run; al empujar una etiqueta vX.Y.Z se publican además como GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linux:
+    name: Paquete .deb
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-musl
+      - uses: Swatinem/rust-cache@v2
+      - run: sudo apt-get update && sudo apt-get install -y musl-tools
+      - run: cargo test --workspace
+      - name: Empaquetar
+        run: bash empaquetado/deb.sh
+      - name: Probar el paquete instalado
+        run: |
+          sudo apt-get install -y ./dist/crucible_*_amd64.deb
+          crucible --version
+          crucible --validar /usr/share/crucible/banco/banco.yaml
+          cd /tmp && (crucible > crucible.log 2>&1 &) && sleep 2
+          test "$(printf '*IDN?\n' | nc -q1 127.0.0.1 5025)" = "Crucible,FUENTE-DC,SIM0001,1.0"
+          cat crucible.log
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crucible-linux
+          path: dist/*.deb
+
+  windows:
+    name: Instalador Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace
+      - run: cargo build --release --locked -p crucible
+      - name: Versión
+        id: version
+        shell: bash
+        run: |
+          v=$(cargo metadata --no-deps --format-version 1 | python -c 'import json,sys; print(next(p["version"] for p in json.load(sys.stdin)["packages"] if p["name"]=="crucible"))')
+          echo "v=$v" >> "$GITHUB_OUTPUT"
+      - name: Instalar Inno Setup
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup --no-progress -y
+          }
+      - name: Compilar instalador
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" `
+            "/DVersion=${{ steps.version.outputs.v }}" `
+            "/DBinario=..\..\target\release\crucible.exe" `
+            empaquetado\windows\crucible.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Probar el instalador
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem dist\crucible-*-setup.exe | Select-Object -First 1
+          Start-Process $setup.FullName -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -Wait
+          $app = "$env:LOCALAPPDATA\Programs\Crucible"
+          & "$app\crucible.exe" --version
+          & "$app\crucible.exe" --validar "$app\banco\banco.yaml"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $p = Start-Process "$app\crucible.exe" -WorkingDirectory "$app\banco" -PassThru -NoNewWindow
+          Start-Sleep 2
+          $c = New-Object Net.Sockets.TcpClient('127.0.0.1', 5025); $s = $c.GetStream()
+          $w = New-Object IO.StreamWriter($s); $w.AutoFlush = $true; $w.WriteLine('*IDN?')
+          $r = (New-Object IO.StreamReader($s)).ReadLine(); $c.Close(); Stop-Process $p
+          Write-Host "IDN: $r"
+          if ($r -ne 'Crucible,FUENTE-DC,SIM0001,1.0') { exit 1 }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crucible-windows
+          path: dist/*.exe
+
+  publicar:
+    name: Publicar release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [linux, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" dist/* --repo "${{ github.repository }}" --title "Crucible ${{ github.ref_name }}" --generate-notes
