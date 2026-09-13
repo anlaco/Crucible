@@ -20,7 +20,6 @@ use tokio::sync::Mutex;
 pub async fn bind_tcp(host: &str, puerto: u16) -> anyhow::Result<TcpListener> {
     let addr = format!("{}:{}", host, puerto);
     let listener = TcpListener::bind(&addr).await?;
-    eprintln!("escuchando en {}", listener.local_addr()?);
     Ok(listener)
 }
 
