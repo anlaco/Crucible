@@ -1,0 +1,29 @@
+# Banco de ejemplo de Crucible.
+#
+# Un banco es la lista de instrumentos que se simulan a la vez. Cada uno apunta
+# a su perfil (qué instrumento es y cómo responde) y dice en qué puerto escucha.
+#
+# Para tu banco: copia esta carpeta, añade un perfil por cada modelo de
+# instrumento y una entrada por cada unidad física. Dos unidades del mismo
+# modelo comparten perfil, pero cada una necesita su propio puerto.
+#
+# Comprueba el banco sin arrancarlo:   crucible --validar banco.yaml
+# Arráncalo:                           crucible banco.yaml
+
+banco:
+  nombre: banco-de-ejemplo
+  dispositivos:
+    - id: fuente
+      perfil: perfiles/fuente_dc.yaml
+      transporte: { tipo: tcp, puerto: 5025 }
+
+    - id: multimetro
+      perfil: perfiles/multimetro.yaml
+      transporte: { tipo: tcp, puerto: 5026 }
+      # Se puede cambiar el estado de arranque de una unidad sin tocar su perfil.
+      estado_inicial:
+        tension_entrada: 3.3
+
+    - id: smu
+      perfil: perfiles/keithley_2400_demo.yaml
+      transporte: { tipo: tcp, puerto: 5027 }

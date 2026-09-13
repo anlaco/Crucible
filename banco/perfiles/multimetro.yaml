@@ -1,0 +1,61 @@
+# Multímetro digital midiendo tensión DC en sus bornes.
+#
+# La tensión "que hay en los bornes" es la variable `tension_entrada`. En el
+# banco se puede fijar por unidad con `estado_inicial`, y durante una prueba se
+# puede cambiar por SCPI con el comando de simulación `SIMulate:INPut`, que no
+# existe en el instrumento real pero permite a un script provocar escenarios.
+
+dispositivo:
+  modelo: MULTIMETRO
+  tipo: instrumento
+  idn: "Crucible,MULTIMETRO,SIM0002,1.0"
+
+protocolo: scpi
+
+estado:
+  tension_entrada: 0.0
+  rango: 10.0
+  nplc: 1.0
+
+comandos:
+  - patron: "MEASure:VOLTage[:DC]"
+    query: true
+    modelo: lectura
+  - patron: "READ"
+    query: true
+    modelo: lectura
+
+  # CONF:VOLT:DC [rango]: el rango es opcional.
+  - patron: "CONFigure:VOLTage[:DC]"
+    args: [rango]
+    muta: { rango: "<rango>" }
+  - patron: "CONFigure"
+    query: true
+    respuesta: "\"VOLT +{rango}\""
+
+  - patron: "[SENSe:]VOLTage[:DC]:RANGe[:UPPer]"
+    args: [r]
+    muta: { rango: "<r>" }
+  - patron: "[SENSe:]VOLTage[:DC]:RANGe[:UPPer]"
+    query: true
+    respuesta: "{rango}"
+
+  - patron: "[SENSe:]VOLTage[:DC]:NPLCycles"
+    args: [n]
+    muta: { nplc: "<n>" }
+  - patron: "[SENSe:]VOLTage[:DC]:NPLCycles"
+    query: true
+    respuesta: "{nplc}"
+
+  # Solo para simulación: fija la tensión en los bornes.
+  - patron: "SIMulate:INPut"
+    args: [v]
+    muta: { tension_entrada: "<v>" }
+
+modelos:
+  # Más tiempo de integración, menos ruido: el ruido cae con la raíz del NPLC.
+  lectura:
+    tipo: formula
+    expr: "tension_entrada + gauss(0, 0.0001 / sqrt(nplc))"
+    # Como muchos multímetros: +3.300139E+00
+    formato: cientifico:6

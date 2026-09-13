@@ -1,0 +1,74 @@
+# Fuente de alimentación DC de un canal, con una carga resistiva conectada.
+#
+# Es una plantilla: sustituye el `idn` y los comandos por los de tu fuente real.
+# Declara solo lo que usa tu software de medida, no el manual entero.
+
+dispositivo:
+  modelo: FUENTE-DC
+  tipo: instrumento
+  # Lo que contesta *IDN?. Pon el de tu instrumento real si tu software lo comprueba.
+  idn: "Crucible,FUENTE-DC,SIM0001,1.0"
+
+protocolo: scpi
+
+# Variables internas del instrumento y su valor al encender (y tras *RST).
+estado:
+  tension: 0.0          # V programados
+  limite_corriente: 1.0 # A
+  salida: false
+  carga_ohm: 10.0       # la resistencia que "hay conectada" a la salida
+
+comandos:
+  # VOLT 5  /  SOUR:VOLT:LEV 5  /  volt 5  → todas equivalen.
+  - patron: "[SOURce:]VOLTage[:LEVel][:IMMediate][:AMPLitude]"
+    args: [v]
+    muta: { tension: "<v>" }
+  - patron: "[SOURce:]VOLTage[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    respuesta: "{tension}"
+
+  - patron: "[SOURce:]CURRent[:LEVel][:IMMediate][:AMPLitude]"
+    args: [i]
+    muta: { limite_corriente: "<i>" }
+  - patron: "[SOURce:]CURRent[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    respuesta: "{limite_corriente}"
+
+  # OUTP ON / OUTP OFF / OUTP 1 / OUTP 0
+  - patron: "OUTPut[:STATe]"
+    args: [estado]
+    muta: { salida: "<estado>" }
+  - patron: "OUTPut[:STATe]"
+    query: true
+    modelo: salida_como_numero
+
+  - patron: "MEASure[:SCALar]:VOLTage[:DC]"
+    query: true
+    modelo: tension_medida
+  - patron: "MEASure[:SCALar]:CURRent[:DC]"
+    query: true
+    modelo: corriente_medida
+
+modelos:
+  # Los instrumentos SCPI contestan 1/0, no true/false ni 1.0.
+  salida_como_numero:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "1"
+    fallback: 0
+    formato: entero
+
+  tension_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "tension + gauss(0, 0.0005)"
+    fallback: 0.0
+    formato: fijo:4
+
+  # Ley de Ohm, recortada al límite de corriente (la fuente entra en modo CC).
+  corriente_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "min(tension / carga_ohm, limite_corriente) + gauss(0, 1e-5)"
+    fallback: 0.0
+    formato: fijo:5
