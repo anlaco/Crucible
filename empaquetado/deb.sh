@@ -24,7 +24,6 @@ install -Dm755 "target/$objetivo/release/crucible" "$paquete/usr/bin/crucible"
 # argumentos y la plantilla que el usuario copia para hacer el suyo.
 mkdir -p "$paquete/usr/share/crucible"
 cp -r banco "$paquete/usr/share/crucible/banco"
-install -Dm644 banco/MANUAL.md "$paquete/usr/share/doc/crucible/MANUAL.md"
 install -Dm644 LICENSE "$paquete/usr/share/doc/crucible/copyright"
 
 # mktemp crea la raíz con 0700 y el umask puede dejar escritura de grupo:

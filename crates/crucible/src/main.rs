@@ -20,7 +20,7 @@ BANCO POR DEFECTO (sin argumentos), el primero que exista de:
 Cada instrumento escucha en 127.0.0.1 y en su puerto. Desde VISA:
   TCPIP0::127.0.0.1::<puerto>::SOCKET
 
-Documentación: MANUAL.md, junto al banco de ejemplo.";
+Manual: https://anlaco.github.io/Crucible/";
 
 enum Orden {
     Arrancar(PathBuf, Option<u16>),

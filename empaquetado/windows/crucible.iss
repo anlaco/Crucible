@@ -44,21 +44,25 @@ Name: "path"; Description: "Añadir el comando 'crucible' al PATH"; Flags: check
 
 [Files]
 Source: "{#Binario}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\banco\MANUAL.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
 ; El banco no se sobrescribe al actualizar ni se borra al desinstalar: son los
 ; ficheros que el usuario edita para describir su banco.
 Source: "..\..\banco\banco.yaml"; DestDir: "{app}\banco"; Flags: onlyifdoesntexist uninsneveruninstall
 Source: "..\..\banco\perfiles\*.yaml"; DestDir: "{app}\banco\perfiles"; Flags: onlyifdoesntexist uninsneveruninstall
-Source: "..\..\banco\MANUAL.md"; DestDir: "{app}\banco"; Flags: ignoreversion
+
+[InstallDelete]
+; Versiones anteriores traían el manual en .md; al actualizar quedaría desfasado.
+Type: files; Name: "{app}\MANUAL.md"
+Type: files; Name: "{app}\banco\MANUAL.md"
 
 [Icons]
 ; cmd /k deja la ventana abierta si crucible termina, para poder leer el motivo.
 Name: "{group}\Arrancar banco"; Filename: "{cmd}"; Parameters: "/k ""{app}\crucible.exe"" ""{app}\banco\banco.yaml"""; WorkingDir: "{app}\banco"
 Name: "{group}\Abrir carpeta del banco"; Filename: "{app}\banco"
 Name: "{group}\Terminal de Crucible"; Filename: "{cmd}"; Parameters: "/k ""{app}\crucible.exe"" --ayuda"; WorkingDir: "{app}\banco"
-; Con el Bloc de notas: Windows no suele saber abrir un .md.
-Name: "{group}\Manual"; Filename: "{win}\notepad.exe"; Parameters: """{app}\MANUAL.md"""
+; El manual vive en la web: una sola copia, comprobada contra el binario en
+; cada publicación, en vez de un .md empaquetado que se desfasa.
+Name: "{group}\Manual"; Filename: "https://anlaco.github.io/Crucible/"
 Name: "{group}\Desinstalar Crucible"; Filename: "{uninstallexe}"
 
 [Registry]
