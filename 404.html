@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Página no encontrada · Page not found</title>
+<script>
+  // Hasta que el manual tuvo dos idiomas, los capítulos en español colgaban de
+  // la raíz (/Crucible/05-bancos.html). Esos enlaces siguen funcionando.
+  (function () {
+    var m = location.pathname.match(/^(\/Crucible\/)((?:\d\d-[a-z-]+|print)\.html)$/);
+    if (m) location.replace(m[1] + "es/" + m[2] + location.hash);
+  })();
+</script>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 4rem auto; padding: 0 1rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <h1>404</h1>
+  <p>Esta página no existe. <a href="/Crucible/es/">Manual en español</a></p>
+  <p lang="en">This page does not exist. <a href="/Crucible/en/">Manual in English</a></p>
+</body>
+</html>

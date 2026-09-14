@@ -1,0 +1,1307 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Crucible Manual</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="favicon-8114d1fc.png">
+        <link rel="stylesheet" href="css/variables-8adf115d.css">
+        <link rel="stylesheet" href="css/general-e96d0476.css">
+        <link rel="stylesheet" href="css/chrome-d279d366.css">
+        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex-05b9348a.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc-e2cb047d.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Crucible Manual</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/anlaco/Crucible" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="crucible-manual"><a class="header" href="#crucible-manual">Crucible Manual</a></h1>
+<p>Crucible simulates a bench of measurement instruments. You describe each
+instrument in a YAML file and Crucible serves it over the network speaking
+<strong>real SCPI</strong>, just like the physical device. Your test software —PyVISA,
+LabVIEW, a sequencer such as <a href="https://anlaco.github.io/anvil/">Anvil</a>— connects
+to it as if the bench were plugged in, without knowing it is not.</p>
+<p>This manual is also <a href="../es">in Spanish</a>: the <strong>ES</strong> button in the top bar
+takes you to the same page in the other language.</p>
+<p>This manual explains how to use it: install it, start a bench, connect your
+software and describe your own instruments.</p>
+<blockquote>
+<p><strong>Version 0.1.0.</strong> Written and checked against <strong>Crucible 0.1.0 on Linux
+x86-64</strong>. Crucible is young: the chapter <a href="#what-it-does-not-do-yet">What it does not do
+(yet)</a> says plainly where it falls short.</p>
+</blockquote>
+<h2 id="where-to-start"><a class="header" href="#where-to-start">Where to start</a></h2>
+<ul>
+<li><strong>I want to see it working:</strong> chapters 2 to 4, in order.</li>
+<li><strong>I want to simulate my bench:</strong> then 5 to 9. <a href="#recipe-from-a-real-instrument-to-its-profile">Chapter 9</a> is the
+step-by-step recipe.</li>
+<li><strong>I am looking for a field or an option:</strong> <a href="#reference">Reference</a>.</li>
+<li><strong>Something does not answer:</strong> <a href="#troubleshooting">Troubleshooting</a>.</li>
+</ul>
+<h2 id="conventions"><a class="header" href="#conventions">Conventions</a></h2>
+<p>Commands start with <code>$</code> and are run from <strong>your bench folder</strong>, a copy of the
+example bench (chapter 5 shows how to make it), with the bench running in
+another terminal, unless the text says otherwise. The lines after a command are
+what it printed.</p>
+<p>Terminal examples use <code>nc</code> (netcat) because every Linux has it. On Windows,
+chapter 4 gives the PowerShell equivalent.</p>
+<h2 id="crucible-speaks-spanish-for-now"><a class="header" href="#crucible-speaks-spanish-for-now">Crucible speaks Spanish, for now</a></h2>
+<p>Crucible 0.1.0 prints its messages in Spanish, and the file format uses Spanish
+keys: a bench is <code>banco</code>, a profile has <code>estado</code>, <code>comandos</code> and <code>modelos</code>. This
+manual shows everything exactly as Crucible prints and reads it, and explains
+what it means. The keys are not translatable: write them as shown.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Key</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>banco</code>, <code>dispositivos</code></td><td>bench, devices</td></tr>
+<tr><td><code>perfil</code>, <code>transporte</code>, <code>puerto</code></td><td>profile, transport, port</td></tr>
+<tr><td><code>estado</code>, <code>estado_inicial</code></td><td>state, initial state</td></tr>
+<tr><td><code>comandos</code>, <code>patron</code>, <code>muta</code>, <code>respuesta</code></td><td>commands, pattern, mutates, response</td></tr>
+<tr><td><code>modelos</code>, <code>cuando</code>, <code>formato</code></td><td>models, when, format</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="how-this-manual-stays-true"><a class="header" href="#how-this-manual-stays-true">How this manual stays true</a></h2>
+<p>Nothing a command prints was typed by hand. Every terminal session is a file in
+<a href="https://github.com/anlaco/Crucible/tree/main/docs/manual/listings/sesiones"><code>listings/sesiones/</code></a>,
+shared by the Spanish and English editions and included as it is, and
+<a href="https://github.com/anlaco/Crucible/blob/main/docs/manual/check.sh"><code>check.sh</code></a>
+runs them all again against the binary and fails if any no longer matches. The
+example bench and profiles shown in these pages are the repository files, not
+copies.</p>
+<pre><code class="language-console">$ docs/manual/check.sh target/debug/crucible
+</code></pre>
+<p>What could not be run here is marked <strong>not verified</strong>, in those words.</p>
+<p>For how Crucible is built inside —the format as a standard, the design
+decisions— see the
+<a href="https://github.com/anlaco/Crucible/tree/main/docs">repository documentation</a>
+(in Spanish).</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="what-crucible-is"><a class="header" href="#what-crucible-is">What Crucible is</a></h1>
+<p>Crucible lets you <strong>test test software without the hardware</strong>. Instead of
+needing the power supply, the multimeter and the SMU on the desk to develop your
+sequence, you describe how they behave in a few text files and Crucible puts
+them on the network.</p>
+<p>Your software cannot tell the difference, because there is none in what it
+sees: it opens a VISA resource, sends <code>*IDN?</code>, configures <code>VOLT 5</code>, asks
+<code>MEAS:CURR?</code> and gets answers in the real instrument’s format. With the same
+errors, too: a mistyped command leaves its entry in <code>SYST:ERR?</code>, as on a real
+instrument.</p>
+<h2 id="what-it-simulates-and-what-it-does-not"><a class="header" href="#what-it-simulates-and-what-it-does-not">What it simulates and what it does not</a></h2>
+<p>A test instrument is, almost always, <strong>a state machine with responses</strong>: it
+receives a command, changes something inside and answers. Crucible models that:</p>
+<ul>
+<li><strong>State</strong>: the programmed voltage, whether the output is on, the range…</li>
+<li><strong>Commands</strong>: what the instrument understands and what each one changes.</li>
+<li><strong>Models</strong>: how it computes what it “measures”, with a formula over the
+state. A supply’s current can be Ohm’s law with a little noise.</li>
+</ul>
+<p>It does not simulate continuous physics or circuits: the supply does not really
+power the multimeter. If your test needs a value to go from one instrument to
+another, your script sets it (chapter 8 shows how).</p>
+<h2 id="the-words"><a class="header" href="#the-words">The words</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Word</th><th>What it means here</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>bench</strong> (<code>banco</code>)</td><td>The instruments simulated together. A <code>banco.yaml</code> file.</td></tr>
+<tr><td><strong>profile</strong> (<code>perfil</code>)</td><td>The description of <strong>one model</strong> of instrument: its <code>*IDN?</code>, its state, its commands and its models. One YAML file per model.</td></tr>
+<tr><td><strong>device</strong> (<code>dispositivo</code>)</td><td>One <strong>unit</strong> on the bench: a profile served on a port. Two identical multimeters are two devices with the same profile.</td></tr>
+<tr><td><strong>state</strong> (<code>estado</code>)</td><td>The variables the instrument remembers. There is one per device, shared by every connection.</td></tr>
+<tr><td><strong>model</strong> (<code>modelo</code>)</td><td>A formula that computes a query’s response from the state.</td></tr>
+<tr><td><strong>VISA resource</strong></td><td>The address your software opens the instrument with: <code>TCPIP0::127.0.0.1::5025::SOCKET</code>.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="what-you-need"><a class="header" href="#what-you-need">What you need</a></h2>
+<ul>
+<li><strong>Linux x86-64 or Windows.</strong> Everything in this manual was run on Linux. On
+Windows the commands are the same; the installation and the PowerShell test
+in chapter 4 are run by continuous integration on every release, the rest is
+<strong>not verified</strong> on Windows.</li>
+<li>To try it without your software: <code>nc</code> (netcat) on Linux, or PowerShell on
+Windows.</li>
+<li>For the Python example: Python 3 with <code>pyvisa</code> and <code>pyvisa-py</code>.</li>
+</ul>
+<p>No instrument, no licence and no special VISA driver.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="installing"><a class="header" href="#installing">Installing</a></h1>
+<p>The installers are on the GitHub
+<a href="https://github.com/anlaco/Crucible/releases">releases page</a>.</p>
+<h2 id="linux-debian-ubuntu-and-derivatives"><a class="header" href="#linux-debian-ubuntu-and-derivatives">Linux (Debian, Ubuntu and derivatives)</a></h2>
+<pre><code class="language-console">$ sudo apt install ./crucible_0.1.0_amd64.deb
+</code></pre>
+<p>It leaves:</p>
+<ul>
+<li>the <code>crucible</code> command in <code>/usr/bin</code>;</li>
+<li>the example bench in <code>/usr/share/crucible/banco</code>, read-only (chapter 5 shows
+how to copy it to edit it).</li>
+</ul>
+<p>Check the installation:</p>
+<pre><code class="language-console">$ crucible --version
+crucible 0.1.0
+</code></pre>
+<h2 id="windows"><a class="header" href="#windows">Windows</a></h2>
+<ol>
+<li>Run <code>crucible-0.1.0-setup.exe</code>. It does not ask for administrator rights.</li>
+<li>The installer leaves:
+<ul>
+<li>In the <strong>Start menu → Crucible</strong>: <em>Arrancar banco</em> (start bench), <em>Abrir
+carpeta del banco</em> (open the bench folder), <em>Terminal de Crucible</em> (a
+console showing the command’s help) and <em>Manual</em> (opens this website).</li>
+<li>The <code>crucible</code> command on the <code>PATH</code>, for any new terminal (cmd or
+PowerShell).</li>
+<li>The example bench in <code>%LOCALAPPDATA%\Programs\Crucible\banco</code>, which you
+can edit right there.</li>
+</ul>
+</li>
+</ol>
+<p>Upgrading to a new version <strong>does not overwrite</strong> bench files that already
+exist: your changes are kept.</p>
+<h2 id="from-source"><a class="header" href="#from-source">From source</a></h2>
+<p>With Rust 1.90 or later:</p>
+<pre><code class="language-console">$ git clone https://github.com/anlaco/Crucible
+$ cd Crucible
+$ cargo build --release -p crucible
+</code></pre>
+<p>The binary ends up in <code>target/release/crucible</code> and the example bench in
+<code>banco/</code>. Replace <code>crucible</code> with that path in the rest of the manual, or add it
+to your <code>PATH</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="first-start"><a class="header" href="#first-start">First start</a></h1>
+<p>Crucible ships an example bench with three instruments: a DC power supply, a
+multimeter and a Keithley 2400. It is there to see it working before you
+describe anything.</p>
+<h2 id="start-the-bench"><a class="header" href="#start-the-bench">Start the bench</a></h2>
+<ul>
+<li><strong>Linux:</strong> run <code>crucible</code> with no arguments.</li>
+<li><strong>Windows:</strong> Start menu → Crucible → <em>Arrancar banco</em>.</li>
+</ul>
+<pre><code class="language-console">$ crucible
+Crucible 0.1.0 — banco.yaml
+
+  ID          MODELO         RECURSO VISA
+  fuente      FUENTE-DC      TCPIP0::127.0.0.1::5025::SOCKET
+  multimetro  MULTIMETRO     TCPIP0::127.0.0.1::5026::SOCKET
+  smu         KEITHLEY-2400  TCPIP0::127.0.0.1::5027::SOCKET
+
+Listo. Ctrl+C para parar.
+</code></pre>
+<p>Each row is an instrument listening on its port (the columns: ID, model, VISA
+resource). While the window stays open they are “switched on”; every incoming
+connection is logged below. <code>Ctrl+C</code> switches them off (<em>Listo</em> means <em>ready</em>).</p>
+<p>With no arguments, <code>crucible</code> uses the first bench it finds from this list:</p>
+<ol>
+<li><code>banco.yaml</code> in the folder you run it from.</li>
+<li><code>banco/banco.yaml</code> next to the executable (Windows installation).</li>
+<li><code>/usr/share/crucible/banco/banco.yaml</code> (Linux installation).</li>
+</ol>
+<p>To start a specific one: <code>crucible path/to/banco.yaml</code>.</p>
+<h2 id="ask-each-instrument-who-it-is"><a class="header" href="#ask-each-instrument-who-it-is">Ask each instrument who it is</a></h2>
+<p>In <strong>another</strong> terminal, with the bench running:</p>
+<pre><code class="language-console">$ printf '*IDN?\n' | nc -q1 127.0.0.1 5025
+Crucible,FUENTE-DC,SIM0001,1.0
+$ printf '*IDN?\n' | nc -q1 127.0.0.1 5026
+Crucible,MULTIMETRO,SIM0002,1.0
+$ printf '*IDN?\n' | nc -q1 127.0.0.1 5027
+Keithley,2400,1234567,A1.2
+</code></pre>
+<p>Each port is a different instrument, and each one answers with its own <code>*IDN?</code>.</p>
+<blockquote>
+<p><strong><code>-q1</code> matters.</strong> Without it, Debian’s and Ubuntu’s <code>nc</code> does not close the
+connection after sending, and the command waits forever.</p>
+</blockquote>
+<p>That is all you need to get going: they are TCP sockets speaking SCPI
+terminated by a newline. The next chapter connects a real program.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="connecting-your-software"><a class="header" href="#connecting-your-software">Connecting your software</a></h1>
+<p>Each instrument on the bench is a <strong>TCP socket on <code>127.0.0.1</code></strong>, on its own
+port. For VISA, the resource is:</p>
+<pre><code class="language-text">TCPIP0::127.0.0.1::&lt;port&gt;::SOCKET
+</code></pre>
+<p><strong>Termination:</strong> messages end with a newline (<code>\n</code>, 0x0A) in both directions.
+With <code>::SOCKET</code> resources VISA does not add it by default: set it on your
+session, or your software will wait for an answer that Crucible does not
+process until it receives the newline.</p>
+<h2 id="pyvisa"><a class="header" href="#pyvisa">PyVISA</a></h2>
+<p><code>pip install pyvisa pyvisa-py</code> is enough; NI-VISA is not needed. This script
+talks to the supply and the multimeter on the example bench:</p>
+<pre><code class="language-python">import pyvisa
+
+rm = pyvisa.ResourceManager("@py")  # o ResourceManager() si usas NI-VISA
+opciones = dict(read_termination="\n", write_termination="\n")
+
+fuente = rm.open_resource("TCPIP0::127.0.0.1::5025::SOCKET", **opciones)
+dmm = rm.open_resource("TCPIP0::127.0.0.1::5026::SOCKET", **opciones)
+
+print(fuente.query("*IDN?"))
+fuente.write("VOLT 5")
+fuente.write("OUTP ON")
+print(fuente.query("MEAS:CURR?"))  # 5 V sobre la carga de 10 ohmios
+print(dmm.query("MEAS:VOLT?"))
+</code></pre>
+<pre><code class="language-console">$ python3 conectar.py
+Crucible,FUENTE-DC,SIM0001,1.0
+0.50001
++3.300139E+00
+</code></pre>
+<p>The supply has a simulated 10 Ω load connected, so at 5 V it gives half an
+ampere. The multimeter reads 3.3 V because the example bench sets that when it
+starts (chapter 5). The last digit is Gaussian noise, which repeats the same
+every time you start the bench (chapter 7).</p>
+<h2 id="ni-max-and-labview"><a class="header" href="#ni-max-and-labview">NI MAX and LabVIEW</a></h2>
+<p><strong>Not verified</strong> in this manual.</p>
+<p>Add the instrument in NI MAX as <em>VISA TCP/IP Resource → Manual Entry of Raw
+Socket</em>, with host <code>127.0.0.1</code> and the bench port. In LabVIEW, when opening the
+VISA session, enable the <code>\n</code> (0x0A) termination character for reads
+(<em>Termination Character Enabled</em>) and end every write with <code>\n</code>.</p>
+<h2 id="windows-without-installing-anything"><a class="header" href="#windows-without-installing-anything">Windows, without installing anything</a></h2>
+<p>From PowerShell. It is the same test continuous integration runs against the
+Windows installer on every release:</p>
+<pre><code class="language-powershell">$c = New-Object Net.Sockets.TcpClient('127.0.0.1', 5025); $s = $c.GetStream()
+$w = New-Object IO.StreamWriter($s); $w.AutoFlush = $true; $w.WriteLine('*IDN?')
+(New-Object IO.StreamReader($s)).ReadLine(); $c.Close()
+</code></pre>
+<h2 id="if-your-software-points-at-the-real-benchs-ips"><a class="header" href="#if-your-software-points-at-the-real-benchs-ips">If your software points at the real bench’s IPs</a></h2>
+<p>Software that today opens <code>TCPIP0::192.168.1.10::5025::SOCKET</code>,
+<code>TCPIP0::192.168.1.11::5025::SOCKET</code>… has to open
+<code>TCPIP0::127.0.0.1::5025::SOCKET</code>, <code>TCPIP0::127.0.0.1::5026::SOCKET</code>… Change the
+addresses in its configuration; you choose the ports in <code>banco.yaml</code>.</p>
+<p>If it uses <code>::INSTR</code> (VXI-11) resources, change them to <code>::SOCKET</code>: Crucible
+does not speak VXI-11 yet (see <a href="#what-it-does-not-do-yet">What it does not do</a>).</p>
+<h2 id="anvil"><a class="header" href="#anvil">Anvil</a></h2>
+<p>The <a href="https://anlaco.github.io/anvil/">Anvil</a> sequencer speaks SCPI over a
+socket, so it connects to Crucible with nothing special. The guide
+<a href="https://github.com/anlaco/Crucible/blob/main/docs/guia-inicio-rapido.md">Anvil measures against a Crucible instrument</a>
+(in Spanish) walks through it end to end.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="building-your-bench"><a class="header" href="#building-your-bench">Building your bench</a></h1>
+<p>A bench is a folder shaped like this:</p>
+<pre><code class="language-text">mi_banco/
+├── banco.yaml             ← which instruments there are and on which port
+└── perfiles/
+    ├── fuente_xyz.yaml    ← one profile per instrument MODEL
+    └── dmm_abc.yaml
+</code></pre>
+<h2 id="start-by-copying-the-example"><a class="header" href="#start-by-copying-the-example">Start by copying the example</a></h2>
+<p>The quickest way is to start from the example bench and change it:</p>
+<ul>
+<li>
+<p><strong>Linux:</strong></p>
+<pre><code class="language-console">$ cp -r /usr/share/crucible/banco ~/mi_banco
+$ cd ~/mi_banco
+</code></pre>
+</li>
+<li>
+<p><strong>Windows:</strong> Start menu → Crucible → <em>Abrir carpeta del banco</em>, and edit it
+there or copy the folder somewhere else.</p>
+</li>
+</ul>
+<p>From that folder, <code>crucible</code> with no arguments starts your bench: it is the
+first place it looks.</p>
+<h2 id="bancoyaml"><a class="header" href="#bancoyaml"><code>banco.yaml</code></a></h2>
+<p>This is the example’s (its comments are in Spanish; the text below explains
+every field):</p>
+<pre><code class="language-yaml"># Banco de ejemplo de Crucible.
+#
+# Un banco es la lista de instrumentos que se simulan a la vez. Cada uno apunta
+# a su perfil (qué instrumento es y cómo responde) y dice en qué puerto escucha.
+#
+# Para tu banco: copia esta carpeta, añade un perfil por cada modelo de
+# instrumento y una entrada por cada unidad física. Dos unidades del mismo
+# modelo comparten perfil, pero cada una necesita su propio puerto.
+#
+# Comprueba el banco sin arrancarlo:   crucible --validar banco.yaml
+# Arráncalo:                           crucible banco.yaml
+
+banco:
+  nombre: banco-de-ejemplo
+  dispositivos:
+    - id: fuente
+      perfil: perfiles/fuente_dc.yaml
+      transporte: { tipo: tcp, puerto: 5025 }
+
+    - id: multimetro
+      perfil: perfiles/multimetro.yaml
+      transporte: { tipo: tcp, puerto: 5026 }
+      # Se puede cambiar el estado de arranque de una unidad sin tocar su perfil.
+      estado_inicial:
+        tension_entrada: 3.3
+
+    - id: smu
+      perfil: perfiles/keithley_2400_demo.yaml
+      transporte: { tipo: tcp, puerto: 5027 }
+</code></pre>
+<p>Each entry under <code>dispositivos</code> is <strong>one unit</strong>:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Field</th><th>What it is</th></tr>
+</thead>
+<tbody>
+<tr><td><code>id</code></td><td>A name for you. It appears in the start-up table and in errors.</td></tr>
+<tr><td><code>perfil</code></td><td>The instrument’s profile, with its path <strong>relative to <code>banco.yaml</code></strong>.</td></tr>
+<tr><td><code>transporte</code></td><td>Where it listens: <code>{ tipo: tcp, puerto: 5025 }</code>. Today <code>tipo</code> can only be <code>tcp</code>.</td></tr>
+<tr><td><code>estado_inicial</code></td><td>Optional. Values that replace those in the profile’s <code>estado</code> for this unit only.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Two units of the same model <strong>share a profile</strong> and use different ports, and,
+if needed, a different <code>estado_inicial</code>:</p>
+<pre><code class="language-yaml">    - id: dmm_entrada
+      perfil: perfiles/dmm_abc.yaml
+      transporte: { tipo: tcp, puerto: 5026 }
+
+    - id: dmm_salida
+      perfil: perfiles/dmm_abc.yaml
+      transporte: { tipo: tcp, puerto: 5027 }
+      estado_inicial:
+        tension_entrada: 12.0
+</code></pre>
+<h2 id="validate-before-starting"><a class="header" href="#validate-before-starting">Validate before starting</a></h2>
+<pre><code class="language-console">$ crucible --validar banco.yaml
+banco.yaml es válido:
+
+  ID          MODELO         RECURSO VISA
+  fuente      FUENTE-DC      TCPIP0::127.0.0.1::5025::SOCKET
+  multimetro  MULTIMETRO     TCPIP0::127.0.0.1::5026::SOCKET
+  smu         KEITHLEY-2400  TCPIP0::127.0.0.1::5027::SOCKET
+</code></pre>
+<p><code>--validar</code> loads the bench and all its profiles, checks patterns, formulas and
+ports, and shows the resource table <strong>without opening any port</strong>, so you can
+use it while the bench is running. Do it every time you edit a YAML file: the
+errors say which file, which command and what is wrong.</p>
+<p>Each instrument needs its own port. With this bench, which repeats 5025:</p>
+<pre><code class="language-yaml">banco:
+  nombre: dos-fuentes
+  dispositivos:
+    - id: fuente_a
+      perfil: perfiles/fuente_dc.yaml
+      transporte: { tipo: tcp, puerto: 5025 }
+
+    - id: fuente_b
+      perfil: perfiles/fuente_dc.yaml
+      transporte: { tipo: tcp, puerto: 5025 }
+</code></pre>
+<pre><code class="language-console">$ crucible --validar puerto_repetido.yaml
+
+error: 'fuente_a' y 'fuente_b' usan los dos 127.0.0.1:5025; cada instrumento necesita su puerto
+</code></pre>
+<p>The error says both devices use 127.0.0.1:5025 and each instrument needs its
+own port.</p>
+<h2 id="three-rules-worth-knowing"><a class="header" href="#three-rules-worth-knowing">Three rules worth knowing</a></h2>
+<p><strong>If one profile has an error, the whole bench does not start.</strong> On purpose: a
+bench missing an instrument would give false results without anyone noticing.</p>
+<p><strong><code>*RST</code> returns the unit to the profile’s values, not to <code>estado_inicial</code>.</strong>
+The example multimeter starts with 3.3 V on its terminals, but after <code>*RST</code> it
+reads 0 V (you will see it in chapter 8). If your software sends <code>*RST</code> at the
+start, set the value in the profile or set it again over SCPI afterwards.</p>
+<p><strong>A misspelled variable in <code>estado_inicial</code> is not an error.</strong> Here
+<code>tension_entarda</code> does not exist in the multimeter profile, and still:</p>
+<pre><code class="language-yaml">banco:
+  nombre: errata
+  dispositivos:
+    - id: dmm
+      perfil: perfiles/multimetro.yaml
+      transporte: { tipo: tcp, puerto: 5030 }
+      estado_inicial:
+        tension_entarda: 12.0
+</code></pre>
+<pre><code class="language-console">$ crucible --validar errata.yaml
+errata.yaml es válido:
+
+  ID   MODELO      RECURSO VISA
+  dmm  MULTIMETRO  TCPIP0::127.0.0.1::5030::SOCKET
+</code></pre>
+<p>(<em>es válido</em> means <em>is valid</em>.) The multimeter will start reading 0 V. If a unit
+does not start with the value you expected, check the spelling first.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="describing-an-instrument"><a class="header" href="#describing-an-instrument">Describing an instrument</a></h1>
+<p>A <strong>profile</strong> describes an instrument model: who it is, what it remembers,
+which commands it understands and what it does with each one. It has five
+sections:</p>
+<pre><code class="language-yaml">dispositivo:   # who it is
+protocolo:     # how it is spoken to; today, always scpi
+estado:        # its internal variables and their power-on value
+comandos:      # what it understands and what it does with each thing
+modelos:       # how it computes what it "measures" (chapter 7)
+</code></pre>
+<p>This is the profile of the supply on the example bench. It is worth reading in
+full (the comments are in Spanish): the rest of the chapter takes it apart.</p>
+<pre><code class="language-yaml"># Fuente de alimentación DC de un canal, con una carga resistiva conectada.
+#
+# Es una plantilla: sustituye el `idn` y los comandos por los de tu fuente real.
+# Declara solo lo que usa tu software de medida, no el manual entero.
+
+dispositivo:
+  modelo: FUENTE-DC
+  tipo: instrumento
+  # Lo que contesta *IDN?. Pon el de tu instrumento real si tu software lo comprueba.
+  idn: "Crucible,FUENTE-DC,SIM0001,1.0"
+
+protocolo: scpi
+
+# Variables internas del instrumento y su valor al encender (y tras *RST).
+estado:
+  tension: 0.0          # V programados
+  limite_corriente: 1.0 # A
+  salida: false
+  carga_ohm: 10.0       # la resistencia que "hay conectada" a la salida
+
+comandos:
+  # VOLT 5  /  SOUR:VOLT:LEV 5  /  volt 5  → todas equivalen.
+  - patron: "[SOURce:]VOLTage[:LEVel][:IMMediate][:AMPLitude]"
+    args: [v]
+    muta: { tension: "&lt;v&gt;" }
+  - patron: "[SOURce:]VOLTage[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    respuesta: "{tension}"
+
+  - patron: "[SOURce:]CURRent[:LEVel][:IMMediate][:AMPLitude]"
+    args: [i]
+    muta: { limite_corriente: "&lt;i&gt;" }
+  - patron: "[SOURce:]CURRent[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    respuesta: "{limite_corriente}"
+
+  # OUTP ON / OUTP OFF / OUTP 1 / OUTP 0
+  - patron: "OUTPut[:STATe]"
+    args: [estado]
+    muta: { salida: "&lt;estado&gt;" }
+  - patron: "OUTPut[:STATe]"
+    query: true
+    modelo: salida_como_numero
+
+  - patron: "MEASure[:SCALar]:VOLTage[:DC]"
+    query: true
+    modelo: tension_medida
+  - patron: "MEASure[:SCALar]:CURRent[:DC]"
+    query: true
+    modelo: corriente_medida
+
+modelos:
+  # Los instrumentos SCPI contestan 1/0, no true/false ni 1.0.
+  salida_como_numero:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "1"
+    fallback: 0
+    formato: entero
+
+  tension_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "tension + gauss(0, 0.0005)"
+    fallback: 0.0
+    formato: fijo:4
+
+  # Ley de Ohm, recortada al límite de corriente (la fuente entra en modo CC).
+  corriente_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "min(tension / carga_ohm, limite_corriente) + gauss(0, 1e-5)"
+    fallback: 0.0
+    formato: fijo:5
+</code></pre>
+<h2 id="dispositivo"><a class="header" href="#dispositivo"><code>dispositivo</code></a></h2>
+<pre><code class="language-yaml">dispositivo:
+  modelo: DMM-ABC                        # required; shown in the start-up table
+  idn: "ACME,DMM-ABC,SN12345,FW2.01"     # what *IDN? answers
+</code></pre>
+<p>If your software checks <code>*IDN?</code> to recognise the instrument, copy the real
+device’s answer here <strong>exactly</strong>.</p>
+<h2 id="protocolo"><a class="header" href="#protocolo"><code>protocolo</code></a></h2>
+<p><code>scpi</code>. The format reserves other values (<code>modbus_tcp</code>, <code>serial_ascii</code>…) for
+what is coming, but today a profile that is not <code>scpi</code> does not start.</p>
+<h2 id="estado"><a class="header" href="#estado"><code>estado</code></a></h2>
+<p>The variables the instrument remembers, with their power-on value, the one
+they return to on <code>*RST</code>:</p>
+<pre><code class="language-yaml">estado:
+  tension: 0.0
+  salida: false
+  funcion: VOLT
+</code></pre>
+<p>Numbers, <code>true</code>/<code>false</code> and text are accepted. The state is <strong>one per device,
+shared by every connection</strong>: chapter 8 explains what that implies.</p>
+<h2 id="comandos"><a class="header" href="#comandos"><code>comandos</code></a></h2>
+<p>Each entry is <strong>a command</strong> or <strong>a query</strong>. If a command has both forms, like
+<code>VOLT 5</code> and <code>VOLT?</code>, it is declared twice:</p>
+<pre><code class="language-yaml">comandos:
+  # Command: VOLT 5  →  stores 5 in the 'tension' variable
+  - patron: "[SOURce:]VOLTage[:LEVel]"
+    args: [v]
+    muta: { tension: "&lt;v&gt;" }
+
+  # Query: VOLT?  →  answers with the value of 'tension'
+  - patron: "[SOURce:]VOLTage[:LEVel]"
+    query: true
+    respuesta: "{tension}"
+
+  # Computed query: MEAS:VOLT?  →  answered by the 'lectura' model
+  - patron: "MEASure:VOLTage[:DC]"
+    query: true
+    modelo: lectura
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Field</th><th>What it is</th></tr>
+</thead>
+<tbody>
+<tr><td><code>patron</code></td><td>The header in manual notation (below). <strong>No <code>?</code> and no arguments.</strong></td></tr>
+<tr><td><code>query</code></td><td><code>true</code> if it is the query. Otherwise, it is a command.</td></tr>
+<tr><td><code>args</code></td><td>Names for incoming arguments, in order: with <code>args: [v]</code>, in <code>VOLT 5</code> <code>&lt;v&gt;</code> is <code>5</code>.</td></tr>
+<tr><td><code>muta</code></td><td>State variables it changes: <code>{ tension: "&lt;v&gt;" }</code>, or a fixed value, <code>{ funcion: VOLT }</code>.</td></tr>
+<tr><td><code>respuesta</code></td><td>(queries) The text to answer. <code>{variable}</code> is replaced by the state and <code>&lt;arg&gt;</code> by the argument.</td></tr>
+<tr><td><code>modelo</code></td><td>(queries) The model in <code>modelos</code> that computes the answer.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Every query needs <code>respuesta</code> or <code>modelo</code>. A command may carry only <code>muta</code>, or
+nothing if being accepted without error is enough.</p>
+<h3 id="pattern-notation"><a class="header" href="#pattern-notation">Pattern notation</a></h3>
+<p>It is the notation of manufacturers’ manuals:</p>
+<ul>
+<li><strong>Upper case</strong> is the required short form, and lower case completes the long
+form. <code>VOLTage</code> accepts <code>VOLT</code> and <code>VOLTAGE</code>, in upper or lower case.</li>
+<li><strong>Brackets</strong> mark nodes that can be left out. <code>[SOURce:]VOLTage[:LEVel]</code>
+accepts <code>VOLT</code>, <code>SOUR:VOLT</code>, <code>volt:lev</code>, <code>SOURCE:VOLTAGE:LEVEL</code>…</li>
+</ul>
+<p>One pattern thus covers every form the real instrument accepts, without listing
+them. Against the example supply:</p>
+<pre><code class="language-console">$ printf 'VOLT 5\n' | nc -q1 127.0.0.1 5025
+$ printf 'VOLT?\n' | nc -q1 127.0.0.1 5025
+5.0
+$ printf 'source:voltage:level 7.5\n' | nc -q1 127.0.0.1 5025
+$ printf 'SOUR:VOLT?\n' | nc -q1 127.0.0.1 5025
+7.5
+</code></pre>
+<p>Commands answer nothing, as on a real instrument: that is why no line appears
+after <code>VOLT 5</code>.</p>
+<blockquote>
+<p>Copy patterns from the manufacturer’s manual (<code>MEASure:VOLTage[:DC]</code>), not the
+short form your software uses (<code>MEAS:VOLT</code>). That way the profile accepts
+whatever any other program sends.</p>
+</blockquote>
+<h3 id="arguments"><a class="header" href="#arguments">Arguments</a></h3>
+<ul>
+<li><code>ON</code>, <code>OFF</code>, <code>1</code> and <code>0</code> are stored as true or false, and models treat them
+the same.</li>
+<li>If a declared argument does not arrive (<code>CONF:VOLT</code> with no range), the
+variable <strong>stays as it was</strong>.</li>
+<li>Without names in <code>args</code>, arguments are referred to by position: <code>&lt;0&gt;</code>, <code>&lt;1&gt;</code>.</li>
+<li>A reference that does not exist, such as <code>{no_such_variable}</code>, is answered
+literally, braces included. If you see braces in an answer, there is a typo in
+the profile.</li>
+</ul>
+<h3 id="multi-channel-instruments"><a class="header" href="#multi-channel-instruments">Multi-channel instruments</a></h3>
+<p>One pattern per channel, with the number inside:</p>
+<pre><code class="language-yaml">  - patron: "SOURce1:VOLTage"
+    args: [v]
+    muta: { tension_1: "&lt;v&gt;" }
+  - patron: "SOURce2:VOLTage"
+    args: [v]
+    muta: { tension_2: "&lt;v&gt;" }
+</code></pre>
+<p><code>SOUR1:VOLT 3</code> goes to channel 1 and <code>SOUR2:VOLT 7</code> to channel 2. <code>SOUR:VOLT</code>,
+with no number, is <strong>not</strong> taken as channel 1: if your software sends it that
+way, declare the unnumbered pattern too. A channel list such as
+<code>MEAS:VOLT? (@2)</code> arrives as an argument with the text <code>(@2)</code>.</p>
+<h2 id="when-a-command-is-not-in-the-profile"><a class="header" href="#when-a-command-is-not-in-the-profile">When a command is not in the profile</a></h2>
+<p>The connection is not dropped and nothing is answered: the error goes into the
+error queue, as the instrument would do. <code>VOLT:PROT</code> is not in the supply’s
+profile:</p>
+<pre><code class="language-console">$ printf 'VOLT:PROT 30\n' | nc -q1 127.0.0.1 5025
+$ printf 'SYST:ERR?\n' | nc -q1 127.0.0.1 5025
+-113,"Undefined header;VOLT:PROT"
+$ printf 'SYST:ERR?\n' | nc -q1 127.0.0.1 5025
+0,"No error"
+</code></pre>
+<p><code>SYST:ERR?</code> is the first tool for completing a profile: it tells you which
+header it did not recognise. Each read takes one error off the queue; when it is
+empty, it answers <code>0,"No error"</code>.</p>
+<h2 id="what-you-do-not-declare"><a class="header" href="#what-you-do-not-declare">What you do not declare</a></h2>
+<p><code>*IDN?</code>, <code>*RST</code>, <code>SYST:ERR?</code> and the other common commands are handled by
+Crucible for every instrument (full list in chapter 8). Declaring them is an
+error:</p>
+<pre><code class="language-console">$ crucible --validar perfiles/rst_declarado.yaml
+
+error: perfiles/rst_declarado.yaml: perfil inválido: el patrón '*RST' es un comando común de IEEE 488.2. Ya no se declaran en el perfil: los resuelve el motor. '*IDN?' sale de 'dispositivo.idn'
+</code></pre>
+<p>The message says <code>*RST</code> is an IEEE 488.2 common command, which the engine
+resolves, and that <code>*IDN?</code> comes from <code>dispositivo.idn</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="models-what-the-instrument-measures"><a class="header" href="#models-what-the-instrument-measures">Models: what the instrument measures</a></h1>
+<p>A query with <code>respuesta: "{tension}"</code> returns what was configured. A measurement
+is something else: the current a supply delivers depends on the voltage, the
+load and whether the output is on. That is a <strong>model</strong>.</p>
+<pre><code class="language-yaml">modelos:
+  corriente_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "min(tension / carga_ohm, limite_corriente) + gauss(0, 1e-5)"
+    fallback: 0.0
+    formato: fijo:5
+</code></pre>
+<p>And the query that uses it:</p>
+<pre><code class="language-yaml">  - patron: "MEASure[:SCALar]:CURRent[:DC]"
+    query: true
+    modelo: corriente_medida
+</code></pre>
+<h2 id="fields"><a class="header" href="#fields">Fields</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Field</th><th>What it is</th></tr>
+</thead>
+<tbody>
+<tr><td><code>tipo</code></td><td>Always <code>formula</code>.</td></tr>
+<tr><td><code>expr</code></td><td>The formula.</td></tr>
+<tr><td><code>cuando</code></td><td>Conditions on the state. If any is not met, <code>fallback</code> is answered. If there are several, all must hold.</td></tr>
+<tr><td><code>fallback</code></td><td>The answer when <code>cuando</code> is not met. Defaults to <code>0.0</code>. Number or text.</td></tr>
+<tr><td><code>formato</code></td><td>How the number is written. Optional.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="what-goes-in-expr"><a class="header" href="#what-goes-in-expr">What goes in <code>expr</code></a></h2>
+<ul>
+<li>State variables, by name: <code>tension</code>, <code>carga_ohm</code>.</li>
+<li>Numbers: <code>10</code>, <code>0.5</code>, <code>1e-3</code>, <code>2.5E+2</code>.</li>
+<li><code>+ - * /</code> with the usual precedence, parentheses and unary minus.</li>
+<li>Functions:</li>
+</ul>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Function</th><th>Result</th></tr>
+</thead>
+<tbody>
+<tr><td><code>gauss(mean, sigma)</code></td><td>Gaussian noise. It changes on every read, but the series repeats the same each time you start Crucible, so automated tests are reproducible.</td></tr>
+<tr><td><code>abs(x)</code></td><td>Absolute value.</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>Square root.</td></tr>
+<tr><td><code>min(a, b)</code>, <code>max(a, b)</code></td><td>Minimum and maximum.</td></tr>
+</tbody>
+</table>
+</div>
+<p>There are no conditionals inside the formula: <code>cuando</code> only chooses between the
+formula and a fixed <code>fallback</code>.</p>
+<h2 id="the-supplys-model-running"><a class="header" href="#the-supplys-model-running">The supply’s model, running</a></h2>
+<p>Against a freshly started bench:</p>
+<pre><code class="language-console">$ printf 'MEAS:CURR?\n' | nc -q1 127.0.0.1 5025
+0.00000
+$ printf 'OUTP?\n' | nc -q1 127.0.0.1 5025
+0
+$ printf 'VOLT 5;:OUTP ON;:MEAS:CURR?\n' | nc -q1 127.0.0.1 5025
+0.50001
+$ printf 'VOLT 20;:MEAS:CURR?;:OUTP?\n' | nc -q1 127.0.0.1 5025
+0.99999;1
+$ printf 'MEAS:VOLT?\n' | nc -q1 127.0.0.1 5026
++3.300139E+00
+</code></pre>
+<p>Step by step:</p>
+<ol>
+<li>With the output off <code>cuando</code> is not met, and the measurement is the
+<code>fallback</code>, written in the model’s format: <code>0.00000</code>.</li>
+<li><code>OUTP?</code> answers <code>0</code>, not <code>false</code>: it is answered by the <code>salida_como_numero</code>
+model, with <code>formato: entero</code>, like a real instrument.</li>
+<li>At 5 V across 10 Ω, half an ampere plus noise.</li>
+<li>At 20 V it would be 2 A, but <code>min</code> clips it to the 1 A limit: the supply goes
+into constant current.</li>
+<li>The multimeter writes scientific notation, like most do.</li>
+</ol>
+<h2 id="formato"><a class="header" href="#formato"><code>formato</code></a></h2>
+<p>Your software expects numbers written the way the real instrument writes them:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th><code>formato</code></th><th>Example answer</th><th>Typical use</th></tr>
+</thead>
+<tbody>
+<tr><td><em>(not set)</em></td><td><code>1.0</code>, <code>4.501385029307777</code></td><td>—</td></tr>
+<tr><td><code>entero</code> (integer)</td><td><code>1</code>, <code>0</code>, <code>-3</code></td><td>States (<code>OUTP?</code>) and counters.</td></tr>
+<tr><td><code>fijo:N</code> (fixed)</td><td><code>fijo:4</code> → <code>4.5014</code></td><td>Supplies that answer with fixed decimals.</td></tr>
+<tr><td><code>cientifico:N</code> (scientific)</td><td><code>cientifico:6</code> → <code>+4.501385E+00</code></td><td>Multimeters and most SCPI measurements.</td></tr>
+</tbody>
+</table>
+</div>
+<p>The format also applies to <code>fallback</code> when it is numeric.</p>
+<p>Queries with <code>respuesta: "{variable}"</code> return the value as it is (<code>5.0</code>). If
+your software expects another form, use a model whose <code>expr</code> is the variable,
+with the right <code>formato</code>.</p>
+<h2 id="errors-in-formulas"><a class="header" href="#errors-in-formulas">Errors in formulas</a></h2>
+<p>Syntax errors —an unclosed parenthesis, a function that does not exist— show up
+when validating or starting, with the position:</p>
+<pre><code class="language-yaml">dispositivo:
+  modelo: DMM-ABC
+  idn: "ACME,DMM-ABC,SN12345,FW2.01"
+
+protocolo: scpi
+
+estado:
+  tension_entrada: 0.0
+
+comandos:
+  - patron: "MEASure:VOLTage[:DC]"
+    query: true
+    modelo: lectura
+
+modelos:
+  lectura:
+    tipo: formula
+    expr: "tension_entrada + gaus(0, 0.0001)"
+</code></pre>
+<pre><code class="language-console">$ crucible --validar perfiles/formula_rota.yaml
+
+error: perfiles/formula_rota.yaml: perfil inválido: modelo 'lectura': error de evaluación: fórmula 'tension_entrada + gaus(0, 0.0001)': función 'gaus' desconocida; existen: gauss, abs, sqrt, min, max (posición 23)
+</code></pre>
+<p>The message says the function <code>gaus</code> is unknown, lists the ones that exist and
+gives the position.</p>
+<p>A <strong>variable that does not exist</strong> in the state, however, is only detected when
+the query is made: no answer arrives and <code>SYST:ERR?</code> returns
+<code>-200,"Execution error;…la variable '…' no existe en el estado…"</code> (<em>the variable
+does not exist in the state</em>). Declare in <code>estado</code> every variable your formulas
+use.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="what-every-instrument-already-does"><a class="header" href="#what-every-instrument-already-does">What every instrument already does</a></h1>
+<p>Some things every SCPI instrument does the same way, and Crucible provides them
+ready-made. They are not declared in the profile.</p>
+<h2 id="common-commands"><a class="header" href="#common-commands">Common commands</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Command</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>*IDN?</code></td><td>Returns <code>dispositivo.idn</code>.</td></tr>
+<tr><td><code>*RST</code></td><td>Returns the state to the profile’s values.</td></tr>
+<tr><td><code>*CLS</code></td><td>Clears the error queue and the status register.</td></tr>
+<tr><td><code>*OPC</code>, <code>*OPC?</code>, <code>*WAI</code></td><td>Synchronisation. Always ready: nothing takes time.</td></tr>
+<tr><td><code>*ESE</code>, <code>*ESE?</code>, <code>*ESR?</code>, <code>*SRE</code>, <code>*SRE?</code>, <code>*STB?</code>, <code>*TST?</code></td><td>IEEE 488.2 registers.</td></tr>
+<tr><td><code>SYSTem:ERRor[:NEXT]?</code></td><td>The next error in the queue, e.g. <code>-113,"Undefined header;FOO"</code>.</td></tr>
+<tr><td><code>SYSTem:VERSion?</code></td><td>The SCPI version.</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="compound-messages"><a class="header" href="#compound-messages">Compound messages</a></h2>
+<p>Several commands separated by <code>;</code> run in order, and query answers come back on
+one line, also separated by <code>;</code> (you saw it in chapter 7: <code>0.99999;1</code>).</p>
+<p>There is an SCPI rule worth being clear about. After a <code>;</code>, the next header is
+<strong>relative to the previous one’s node</strong>, unless it starts with <code>:</code>:</p>
+<pre><code class="language-console">$ printf 'VOLT 5;OUTP ON\n' | nc -q1 127.0.0.1 5025
+$ printf 'OUTP?\n' | nc -q1 127.0.0.1 5025
+1
+$ printf 'SOUR:VOLT 3;OUTP OFF\n' | nc -q1 127.0.0.1 5025
+$ printf 'SYST:ERR?\n' | nc -q1 127.0.0.1 5025
+-113,"Undefined header;SOUR:OUTP"
+$ printf 'SOUR:VOLT 3;:OUTP OFF;:OUTP?\n' | nc -q1 127.0.0.1 5025
+0
+</code></pre>
+<ul>
+<li><code>VOLT 5;OUTP ON</code> works: <code>VOLT</code> hangs off the root, so <code>OUTP</code> does too.</li>
+<li><code>SOUR:VOLT 3;OUTP OFF</code> does not: the current node is <code>SOUR</code>, and <code>OUTP</code> is
+read as <code>SOUR:OUTP</code>, which does not exist. The output stays on.</li>
+<li>With a leading <code>:</code> (<code>;:OUTP OFF</code>) you go back to the root, and it always
+works.</li>
+</ul>
+<p>A real instrument does exactly the same. When in doubt, write <code>;:</code>.</p>
+<h2 id="the-state-is-shared"><a class="header" href="#the-state-is-shared">The state is shared</a></h2>
+<p>Each device has <strong>a single state</strong>, shared by every connection. It is not
+cloned per client or reset on disconnect: just as a real device does not reset
+when someone else picks it up.</p>
+<p>The example multimeter has a command the real one does not, <code>SIMulate:INPut</code>,
+to set the voltage on its terminals from a script. Every command in this session
+is a separate connection:</p>
+<pre><code class="language-console">$ printf 'SIM:INP 12\n' | nc -q1 127.0.0.1 5026
+$ printf 'MEAS:VOLT?\n' | nc -q1 127.0.0.1 5026
++1.200014E+01
+$ printf '*RST\n' | nc -q1 127.0.0.1 5026
+$ printf 'MEAS:VOLT?\n' | nc -q1 127.0.0.1 5026
+-6.313870E-05
+</code></pre>
+<p>The 12 V set by one connection is measured by the next. And after <code>*RST</code> it goes
+back to 0 V —the <strong>profile’s</strong> value—, not to the 3.3 V of the <code>estado_inicial</code>
+the bench started it with.</p>
+<p>In practice:</p>
+<ul>
+<li>If your software configures something and exits, the next run finds it
+configured. Send <code>*RST</code> at the start, or restart Crucible, if you want to
+start from scratch.</li>
+<li><code>SIMulate:INPut</code> is the way to <strong>chain instruments</strong>: devices do not see each
+other, so your script reads the supply and passes the value to the
+multimeter. You can add commands like it to any profile.</li>
+</ul>
+<h2 id="errors-do-not-drop-the-connection"><a class="header" href="#errors-do-not-drop-the-connection">Errors do not drop the connection</a></h2>
+<p>An unknown command, a missing argument or a formula that cannot be evaluated
+leaves its error in the queue and the connection stays open. Your software sees
+it as on the real instrument: by asking <code>SYST:ERR?</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="recipe-from-a-real-instrument-to-its-profile"><a class="header" href="#recipe-from-a-real-instrument-to-its-profile">Recipe: from a real instrument to its profile</a></h1>
+<p>You do not need to describe the instrument’s whole manual. You need to describe
+<strong>what your software uses</strong>, and describe it well.</p>
+<ol>
+<li><strong>Find out which commands your software sends.</strong>
+<ul>
+<li>If you have the real instrument, capture the traffic: NI I/O Trace, your
+application’s log, or Wireshark on the instrument’s port.</li>
+<li>If not, search the code for <code>write(</code>, <code>query(</code>, <code>VISA Write</code>…</li>
+</ul>
+</li>
+<li><strong>Copy the real device’s <code>*IDN?</code></strong> into <code>dispositivo.idn</code>.</li>
+<li><strong>For each configuration command</strong> (<code>VOLT 5</code>, <code>RANG 10</code>):
+<ul>
+<li>a variable in <code>estado</code>, with its power-on value;</li>
+<li>a command with <code>muta</code>;</li>
+<li>and, if your software also reads it back, a query with
+<code>respuesta: "{variable}"</code>.</li>
+</ul>
+</li>
+<li><strong>For each measurement</strong> (<code>MEAS:VOLT?</code>, <code>READ?</code>): a model with the simplest
+physics your test needs. A constant with some noise, or Ohm’s law with the
+supply voltage. Match <code>formato</code> to the device.</li>
+<li><strong>Add the instrument to the bench</strong> with its port (chapter 5).</li>
+<li><strong>Validate:</strong> <code>crucible --validar banco.yaml</code>.</li>
+<li><strong>Start it and run your software.</strong> If something does not answer, ask that
+instrument <code>SYST:ERR?</code>: it tells you which header it did not recognise. Add
+it to the profile and repeat.</li>
+</ol>
+<h2 id="tips"><a class="header" href="#tips">Tips</a></h2>
+<ul>
+<li><strong>Patterns from the manual, not from your code.</strong> <code>MEASure:VOLTage[:DC]</code>
+accepts <code>MEAS:VOLT</code>, <code>measure:voltage:dc</code> and every other form; <code>MEAS:VOLT</code>
+only accepts itself.</li>
+<li><strong>One profile per model, one scenario per bench.</strong> If a test needs the
+instrument to start already configured, do not touch the profile: use
+<code>estado_inicial</code> on the bench. The profile describes the device; the bench,
+the situation.</li>
+<li><strong>Simulation commands.</strong> To provoke scenarios from the script (an
+out-of-range voltage, a failing sensor) add commands the real device does not
+have, like the example multimeter’s <code>SIMulate:INPut</code>.</li>
+<li><strong>Start from the example profiles.</strong> <code>fuente_dc.yaml</code> and <code>multimetro.yaml</code>
+are meant as templates and commented line by line.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="reference"><a class="header" href="#reference">Reference</a></h1>
+<h2 id="the-crucible-command"><a class="header" href="#the-crucible-command">The <code>crucible</code> command</a></h2>
+<pre><code class="language-console">$ crucible --help
+Crucible — simulador de bancos de instrumentos SCPI por red
+
+USO
+  crucible                         arranca el banco por defecto (ver abajo)
+  crucible &lt;banco.yaml&gt;            arranca todos los instrumentos del banco
+  crucible &lt;perfil.yaml&gt; [puerto]  arranca un solo instrumento (puerto 5025)
+  crucible --validar &lt;fichero&gt;     comprueba un banco o perfil sin arrancarlo
+  crucible --version
+
+BANCO POR DEFECTO (sin argumentos), el primero que exista de:
+  1. banco.yaml en el directorio actual
+  2. banco/banco.yaml junto al ejecutable            (instalación Windows)
+  3. ../share/crucible/banco/banco.yaml               (instalación Linux)
+
+Cada instrumento escucha en 127.0.0.1 y en su puerto. Desde VISA:
+  TCPIP0::127.0.0.1::&lt;puerto&gt;::SOCKET
+
+Manual: https://anlaco.github.io/Crucible/
+</code></pre>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Form</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>crucible</code></td><td>Starts the first bench it finds: <code>banco.yaml</code> in the current folder, then next to the executable, then the installed one.</td></tr>
+<tr><td><code>crucible &lt;banco.yaml&gt;</code></td><td>Starts every instrument on the bench.</td></tr>
+<tr><td><code>crucible &lt;profile.yaml&gt; [port]</code></td><td>Starts a single instrument, without a bench. Port 5025 if not given.</td></tr>
+<tr><td><code>crucible --validar &lt;file&gt;</code></td><td>Checks a bench or a profile without opening ports. Exits with code 1 on errors.</td></tr>
+<tr><td><code>crucible --version</code></td><td>The version.</td></tr>
+<tr><td><code>crucible --help</code></td><td>The help. Also <code>-h</code> and <code>--ayuda</code>.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Whether the file is a bench or a profile is decided by its content, not by an
+option: it has <code>banco:</code> or it has <code>dispositivo:</code>.</p>
+<p>Any error makes <code>crucible</code> exit with code 1. With no arguments —usually a
+double-click on Windows— it also waits for you to press Enter, so the window
+does not close before you can read why.</p>
+<h2 id="bancoyaml-1"><a class="header" href="#bancoyaml-1"><code>banco.yaml</code></a></h2>
+<pre><code class="language-yaml">banco:
+  nombre: &lt;text&gt;                    # optional
+  dispositivos:
+    - id: &lt;text&gt;                    # required
+      perfil: &lt;path&gt;                # required; relative to banco.yaml
+      transporte:
+        tipo: tcp                   # required; today only tcp
+        puerto: &lt;number&gt;            # required; different for each device
+        host: &lt;address&gt;             # optional; 127.0.0.1 by default
+      estado_inicial:               # optional
+        &lt;variable&gt;: &lt;value&gt;
+</code></pre>
+<p><code>host</code> decides which interface the device listens on. By default <code>127.0.0.1</code>,
+this computer only. With <code>host: 0.0.0.0</code> it listens on all of them, and another
+computer on the network can connect; in that case the start-up table shows
+<code>TCPIP0::0.0.0.0::…</code>, which is not an address you can connect to: use the IP of
+the computer running Crucible. Access from another computer is <strong>not verified</strong>
+in this manual.</p>
+<h2 id="profile"><a class="header" href="#profile">Profile</a></h2>
+<pre><code class="language-yaml">dispositivo:
+  modelo: &lt;text&gt;                    # required
+  idn: &lt;text&gt;                       # answer to *IDN?
+protocolo: scpi                     # required
+
+estado:
+  &lt;variable&gt;: &lt;number | true | false | text&gt;
+
+comandos:
+  - patron: &lt;header&gt;                # required; no '?', no arguments, no '*'
+    query: &lt;true | false&gt;           # false by default
+    args: [&lt;name&gt;, ...]
+    muta: { &lt;variable&gt;: &lt;value | "&lt;arg&gt;"&gt; }
+    respuesta: &lt;text with {variable} and &lt;arg&gt;&gt;   # queries
+    modelo: &lt;model name&gt;                          # queries
+
+modelos:
+  &lt;name&gt;:
+    tipo: formula                   # required
+    expr: &lt;formula&gt;                 # required
+    cuando: { &lt;variable&gt;: &lt;value&gt; }
+    fallback: &lt;number | text&gt;       # 0.0 by default
+    formato: &lt;entero | fijo:N | cientifico:N&gt;
+</code></pre>
+<h2 id="formulas"><a class="header" href="#formulas">Formulas</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Element</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td>Variables</td><td><code>tension</code>, <code>carga_ohm</code></td></tr>
+<tr><td>Numbers</td><td><code>10</code>, <code>0.5</code>, <code>1e-3</code>, <code>2.5E+2</code></td></tr>
+<tr><td>Operators</td><td><code>+ - * /</code>, parentheses, unary minus</td></tr>
+<tr><td>Functions</td><td><code>gauss(mean, sigma)</code>, <code>abs(x)</code>, <code>sqrt(x)</code>, <code>min(a, b)</code>, <code>max(a, b)</code></td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="scpi-errors-you-will-see"><a class="header" href="#scpi-errors-you-will-see">SCPI errors you will see</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Error</th><th>When</th></tr>
+</thead>
+<tbody>
+<tr><td><code>0,"No error"</code></td><td>The queue is empty.</td></tr>
+<tr><td><code>-113,"Undefined header;…"</code></td><td>The header is not in the profile, or not as a command or query.</td></tr>
+<tr><td><code>-200,"Execution error;…"</code></td><td>A formula could not be evaluated, e.g. a variable that is not in <code>estado</code>.</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="what-it-does-not-do-yet"><a class="header" href="#what-it-does-not-do-yet">What it does not do (yet)</a></h1>
+<p>Worth knowing before you describe your bench.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Limitation</th><th>Consequence</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Only SCPI over a TCP socket</strong> (<code>::SOCKET</code>). No VXI-11 (<code>::INSTR</code>), HiSLIP, USB, GPIB or serial.</td><td>Your software’s <code>TCPIP0::…::INSTR</code> resources must become <code>TCPIP0::…::&lt;port&gt;::SOCKET</code>.</td></tr>
+<tr><td><strong>No Modbus or custom serial protocols.</strong> The format anticipates them, but a profile that is not <code>scpi</code> does not start.</td><td>A thermal camera or a fixture with its own protocol cannot be simulated yet.</td></tr>
+<tr><td><strong>Instruments do not see each other.</strong> The supply does not power the multimeter.</td><td>To chain values, your script sets them (chapter 8).</td></tr>
+<tr><td><strong>No conditionals in formulas.</strong> <code>cuando</code> only chooses between the formula and a fixed <code>fallback</code>.</td><td>A <code>READ?</code> that changes with the configured function (voltage or current) cannot be modelled; simulate the one your test uses.</td></tr>
+<tr><td><strong>No binary data</strong>: <code>#</code> blocks, waveforms, screenshots.</td><td>Text answers only.</td></tr>
+<tr><td><strong>No timing</strong>: everything answers instantly. No slow <code>*OPC</code>, no simulated timeouts.</td><td>It cannot test how your software handles timeouts.</td></tr>
+<tr><td><strong>Noise is reproducible</strong>: the same series on every start.</td><td>Good for automated tests; do not expect different values between runs.</td></tr>
+<tr><td><strong>Messages and file keys are in Spanish.</strong></td><td>This manual translates them where they matter.</td></tr>
+<tr><td><strong>YAML files are read at start-up.</strong></td><td>After editing a file, stop Crucible and start it again.</td></tr>
+</tbody>
+</table>
+</div>
+<p>If any of these blocks your bench,
+<a href="https://github.com/anlaco/Crucible/issues">open an issue</a> with the concrete
+case: which instrument and which commands.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h1>
+<h2 id="no-puede-escuchar-en-1270015025"><a class="header" href="#no-puede-escuchar-en-1270015025">«no puede escuchar en 127.0.0.1:5025»</a></h2>
+<p><em>Cannot listen on 127.0.0.1:5025.</em></p>
+<pre><code class="language-console">$ crucible banco.yaml
+
+error: 'fuente' no puede escuchar en 127.0.0.1:5025 (Address already in use (os error 98)). ¿Hay otro programa, u otro Crucible, usando ese puerto?
+</code></pre>
+<p>Another Crucible, or another program, already has that port. Close the other
+window or change the port in <code>banco.yaml</code>. To see who has it:</p>
+<ul>
+<li>Linux: <code>ss -ltnp | grep :5025</code></li>
+<li>Windows: <code>netstat -ano | findstr :5025</code></li>
+</ul>
+<h2 id="no-encuentro-ningún-banco"><a class="header" href="#no-encuentro-ningún-banco">«no encuentro ningún banco»</a></h2>
+<p><em>I cannot find any bench.</em></p>
+<pre><code class="language-console">$ cd /tmp
+$ crucible
+
+error: no encuentro ningún banco. He buscado en:
+  banco.yaml
+  /usr/bin/banco/banco.yaml
+  /usr/share/crucible/banco/banco.yaml
+
+Indica uno: crucible &lt;banco.yaml&gt;
+
+Pulsa Enter para cerrar.
+</code></pre>
+<p>You ran <code>crucible</code> with no arguments in a folder without <code>banco.yaml</code>, and there
+is no example bench installed where it looks (the message lists the places it
+searched). Give the path: <code>crucible ~/mi_banco/banco.yaml</code>. (With no arguments,
+Crucible waits for Enter —<em>Pulsa Enter para cerrar</em>— in a terminal too.)</p>
+<h2 id="the-windows-window-closes-on-double-click"><a class="header" href="#the-windows-window-closes-on-double-click">The Windows window closes on double-click</a></h2>
+<p>On an error, the window waits for you to press Enter. If it still closes, open
+it from a terminal (<code>cmd</code>) to read the message.</p>
+<h2 id="nc-hangs"><a class="header" href="#nc-hangs"><code>nc</code> hangs</a></h2>
+<p><code>-q1</code> is missing: Debian’s and Ubuntu’s <code>nc</code> does not close the connection after
+sending. <code>printf '*IDN?\n' | nc -q1 127.0.0.1 5025</code>.</p>
+<h2 id="my-software-times-out"><a class="header" href="#my-software-times-out">My software times out</a></h2>
+<ul>
+<li><strong>Missing termination</strong> <code>\n</code> on writes: Crucible does not process the line
+until the newline. With <code>::SOCKET</code> resources, set it in VISA (chapter 4).</li>
+<li><strong>It is a command</strong>, with no <code>?</code>: it answers nothing, like a real instrument.
+Do not read after a command.</li>
+<li><strong>The query is not in the profile</strong>, or a formula failed: no answer arrives
+and the error is queued. Ask <code>SYST:ERR?</code>.</li>
+</ul>
+<h2 id="systerr-returns--113undefined-header"><a class="header" href="#systerr-returns--113undefined-header"><code>SYST:ERR?</code> returns <code>-113,"Undefined header;…"</code></a></h2>
+<p>That header is not in the profile. Check the pattern, and whether it is a
+command or a query (<code>query: true</code>).</p>
+<h2 id="a-chained-command-does-nothing"><a class="header" href="#a-chained-command-does-nothing">A chained command does nothing</a></h2>
+<p><code>SOUR:VOLT 3;OUTP OFF</code> leaves a <code>-113</code> with <code>SOUR:OUTP</code>. It is the SCPI rule:
+after <code>;</code>, the header is relative to the previous node. Write <code>;:OUTP OFF</code>
+(chapter 8).</p>
+<h2 id="meas-always-returns-00"><a class="header" href="#meas-always-returns-00"><code>MEAS:…?</code> always returns <code>0.0</code></a></h2>
+<p>The model’s <code>cuando</code> is not met, for instance because the output is off. Check
+the state with its query (<code>OUTP?</code>).</p>
+<h2 id="an-answer-comes-out-with-braces-tensoin"><a class="header" href="#an-answer-comes-out-with-braces-tensoin">An answer comes out with braces: <code>{tensoin}</code></a></h2>
+<p>The variable does not exist in the state: there is a typo in <code>respuesta</code>.</p>
+<h2 id="a-unit-does-not-start-with-its-estado_inicial-value"><a class="header" href="#a-unit-does-not-start-with-its-estado_inicial-value">A unit does not start with its <code>estado_inicial</code> value</a></h2>
+<p>The variable name is misspelled: <code>estado_inicial</code> does not warn about variables
+that do not exist (chapter 5). Or something sent <code>*RST</code>, which returns to the
+profile’s values.</p>
+<h2 id="i-changed-a-yaml-file-and-nothing-changed"><a class="header" href="#i-changed-a-yaml-file-and-nothing-changed">I changed a YAML file and nothing changed</a></h2>
+<p>Crucible reads the files at start-up. Stop it with <code>Ctrl+C</code> and start it again.</p>
+<h2 id="a-configured-value-stuck-from-a-previous-run"><a class="header" href="#a-configured-value-stuck-from-a-previous-run">A configured value “stuck” from a previous run</a></h2>
+<p>The state is shared and lasts while Crucible is running (chapter 8). Send <code>*RST</code>
+at the start of your tests or restart Crucible.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr-ef4e11c1.min.js"></script>
+        <script src="mark-09e88c2c.min.js"></script>
+        <script src="searcher-09f2665d.js"></script>
+
+        <script src="clipboard-1626706a.min.js"></script>
+        <script src="highlight-abc7f01d.js"></script>
+        <script src="book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../idioma.js"></script>
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+
+    </div>
+    </body>
+</html>

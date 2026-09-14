@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual de Crucible · Crucible Manual</title>
+<script>
+  // Portada: lleva al idioma elegido la última vez o, si no hay, al del
+  // navegador. Español salvo que el navegador prefiera inglés.
+  (function () {
+    var idioma = null;
+    try { idioma = localStorage.getItem("crucible-idioma"); } catch (e) {}
+    if (idioma !== "es" && idioma !== "en") {
+      var nav = (navigator.languages && navigator.languages[0]) || navigator.language || "";
+      idioma = /^en/i.test(nav) ? "en" : "es";
+    }
+    location.replace(idioma + "/");
+  })();
+</script>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 4rem auto; padding: 0 1rem; line-height: 1.6; }
+  a { display: block; font-size: 1.2rem; margin: .5rem 0; }
+</style>
+</head>
+<body>
+  <h1>Crucible</h1>
+  <a href="es/" lang="es" hreflang="es">Manual en español</a>
+  <a href="en/" lang="en" hreflang="en">Manual in English</a>
+</body>
+</html>
