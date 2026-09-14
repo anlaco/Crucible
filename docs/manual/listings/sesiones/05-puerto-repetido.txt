@@ -1,0 +1,3 @@
+$ crucible --validar puerto_repetido.yaml
+
+error: 'fuente_a' y 'fuente_b' usan los dos 127.0.0.1:5025; cada instrumento necesita su puerto

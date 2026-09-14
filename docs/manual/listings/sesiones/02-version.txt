@@ -1,0 +1,2 @@
+$ crucible --version
+crucible 0.1.0

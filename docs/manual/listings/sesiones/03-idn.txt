@@ -1,0 +1,6 @@
+$ printf '*IDN?\n' | nc -q1 127.0.0.1 5025
+Crucible,FUENTE-DC,SIM0001,1.0
+$ printf '*IDN?\n' | nc -q1 127.0.0.1 5026
+Crucible,MULTIMETRO,SIM0002,1.0
+$ printf '*IDN?\n' | nc -q1 127.0.0.1 5027
+Keithley,2400,1234567,A1.2

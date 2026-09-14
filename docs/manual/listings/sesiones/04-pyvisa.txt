@@ -1,0 +1,4 @@
+$ python3 conectar.py
+Crucible,FUENTE-DC,SIM0001,1.0
+0.50001
++3.300139E+00

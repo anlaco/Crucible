@@ -1,0 +1,3 @@
+$ crucible --validar perfiles/formula_rota.yaml
+
+error: perfiles/formula_rota.yaml: perfil inválido: modelo 'lectura': error de evaluación: fórmula 'tension_entrada + gaus(0, 0.0001)': función 'gaus' desconocida; existen: gauss, abs, sqrt, min, max (posición 23)

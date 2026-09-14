@@ -1,0 +1,8 @@
+$ printf 'VOLT 5;OUTP ON\n' | nc -q1 127.0.0.1 5025
+$ printf 'OUTP?\n' | nc -q1 127.0.0.1 5025
+1
+$ printf 'SOUR:VOLT 3;OUTP OFF\n' | nc -q1 127.0.0.1 5025
+$ printf 'SYST:ERR?\n' | nc -q1 127.0.0.1 5025
+-113,"Undefined header;SOUR:OUTP"
+$ printf 'SOUR:VOLT 3;:OUTP OFF;:OUTP?\n' | nc -q1 127.0.0.1 5025
+0

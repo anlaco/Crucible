@@ -1,0 +1,10 @@
+$ printf 'MEAS:CURR?\n' | nc -q1 127.0.0.1 5025
+0.00000
+$ printf 'OUTP?\n' | nc -q1 127.0.0.1 5025
+0
+$ printf 'VOLT 5;:OUTP ON;:MEAS:CURR?\n' | nc -q1 127.0.0.1 5025
+0.50001
+$ printf 'VOLT 20;:MEAS:CURR?;:OUTP?\n' | nc -q1 127.0.0.1 5025
+0.99999;1
+$ printf 'MEAS:VOLT?\n' | nc -q1 127.0.0.1 5026
++3.300139E+00

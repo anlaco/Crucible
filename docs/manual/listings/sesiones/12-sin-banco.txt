@@ -1,0 +1,11 @@
+$ cd /tmp
+$ crucible
+
+error: no encuentro ningún banco. He buscado en:
+  banco.yaml
+  /usr/bin/banco/banco.yaml
+  /usr/share/crucible/banco/banco.yaml
+
+Indica uno: crucible <banco.yaml>
+
+Pulsa Enter para cerrar.

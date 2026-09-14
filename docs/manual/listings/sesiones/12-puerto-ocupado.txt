@@ -1,0 +1,3 @@
+$ crucible banco.yaml
+
+error: 'fuente' no puede escuchar en 127.0.0.1:5025 (Address already in use (os error 98)). ¿Hay otro programa, u otro Crucible, usando ese puerto?

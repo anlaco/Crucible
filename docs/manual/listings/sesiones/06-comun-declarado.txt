@@ -1,0 +1,3 @@
+$ crucible --validar perfiles/rst_declarado.yaml
+
+error: perfiles/rst_declarado.yaml: perfil inválido: el patrón '*RST' es un comando común de IEEE 488.2. Ya no se declaran en el perfil: los resuelve el motor. '*IDN?' sale de 'dispositivo.idn'

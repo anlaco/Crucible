@@ -1,0 +1,12 @@
+dispositivo:
+  modelo: DMM-ABC
+  idn: "ACME,DMM-ABC,SN12345,FW2.01"
+
+protocolo: scpi
+
+estado:
+  lectura: 0.0
+
+comandos:
+  - patron: "*RST"
+    muta: { lectura: 0.0 }

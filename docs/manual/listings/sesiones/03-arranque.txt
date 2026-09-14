@@ -1,0 +1,9 @@
+$ crucible
+Crucible 0.1.0 — banco.yaml
+
+  ID          MODELO         RECURSO VISA
+  fuente      FUENTE-DC      TCPIP0::127.0.0.1::5025::SOCKET
+  multimetro  MULTIMETRO     TCPIP0::127.0.0.1::5026::SOCKET
+  smu         KEITHLEY-2400  TCPIP0::127.0.0.1::5027::SOCKET
+
+Listo. Ctrl+C para parar.

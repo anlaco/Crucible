@@ -1,0 +1,6 @@
+$ printf 'SIM:INP 12\n' | nc -q1 127.0.0.1 5026
+$ printf 'MEAS:VOLT?\n' | nc -q1 127.0.0.1 5026
++1.200014E+01
+$ printf '*RST\n' | nc -q1 127.0.0.1 5026
+$ printf 'MEAS:VOLT?\n' | nc -q1 127.0.0.1 5026
+-6.313870E-05

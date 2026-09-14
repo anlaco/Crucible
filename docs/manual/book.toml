@@ -1,0 +1,24 @@
+# Manual de Crucible, renderizado con mdBook — la herramienta del libro de Rust
+# y la misma que usa el de Anvil.
+#
+#   mdbook build docs/manual      # → target/manual/
+#   mdbook serve docs/manual      # lo mismo, en http://localhost:3000
+#
+# Los capítulos son Markdown normal en esta carpeta. Las sesiones de terminal y
+# los ficheros de ejemplo no se copian dentro: se incluyen con {{#include}}
+# desde listings/ y desde banco/, y check.sh comprueba que siguen siendo ciertos.
+
+[book]
+title = "Manual de Crucible"
+authors = ["ANLACO"]
+language = "es"
+src = "."
+
+[build]
+build-dir = "../../target/manual"
+create-missing = false
+
+[output.html]
+site-url = "/Crucible/"
+git-repository-url = "https://github.com/anlaco/Crucible"
+edit-url-template = "https://github.com/anlaco/Crucible/edit/main/docs/manual/{path}"

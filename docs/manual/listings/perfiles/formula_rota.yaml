@@ -1,0 +1,18 @@
+dispositivo:
+  modelo: DMM-ABC
+  idn: "ACME,DMM-ABC,SN12345,FW2.01"
+
+protocolo: scpi
+
+estado:
+  tension_entrada: 0.0
+
+comandos:
+  - patron: "MEASure:VOLTage[:DC]"
+    query: true
+    modelo: lectura
+
+modelos:
+  lectura:
+    tipo: formula
+    expr: "tension_entrada + gaus(0, 0.0001)"

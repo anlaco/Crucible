@@ -1,0 +1,6 @@
+$ printf 'VOLT 5\n' | nc -q1 127.0.0.1 5025
+$ printf 'VOLT?\n' | nc -q1 127.0.0.1 5025
+5.0
+$ printf 'source:voltage:level 7.5\n' | nc -q1 127.0.0.1 5025
+$ printf 'SOUR:VOLT?\n' | nc -q1 127.0.0.1 5025
+7.5

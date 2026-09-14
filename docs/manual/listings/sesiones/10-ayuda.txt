@@ -1,0 +1,19 @@
+$ crucible --help
+Crucible — simulador de bancos de instrumentos SCPI por red
+
+USO
+  crucible                         arranca el banco por defecto (ver abajo)
+  crucible <banco.yaml>            arranca todos los instrumentos del banco
+  crucible <perfil.yaml> [puerto]  arranca un solo instrumento (puerto 5025)
+  crucible --validar <fichero>     comprueba un banco o perfil sin arrancarlo
+  crucible --version
+
+BANCO POR DEFECTO (sin argumentos), el primero que exista de:
+  1. banco.yaml en el directorio actual
+  2. banco/banco.yaml junto al ejecutable            (instalación Windows)
+  3. ../share/crucible/banco/banco.yaml               (instalación Linux)
+
+Cada instrumento escucha en 127.0.0.1 y en su puerto. Desde VISA:
+  TCPIP0::127.0.0.1::<puerto>::SOCKET
+
+Manual: https://anlaco.github.io/Crucible/

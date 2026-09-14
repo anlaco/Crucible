@@ -1,0 +1,5 @@
+$ printf 'VOLT:PROT 30\n' | nc -q1 127.0.0.1 5025
+$ printf 'SYST:ERR?\n' | nc -q1 127.0.0.1 5025
+-113,"Undefined header;VOLT:PROT"
+$ printf 'SYST:ERR?\n' | nc -q1 127.0.0.1 5025
+0,"No error"

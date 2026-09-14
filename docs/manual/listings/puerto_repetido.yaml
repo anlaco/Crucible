@@ -1,0 +1,10 @@
+banco:
+  nombre: dos-fuentes
+  dispositivos:
+    - id: fuente_a
+      perfil: perfiles/fuente_dc.yaml
+      transporte: { tipo: tcp, puerto: 5025 }
+
+    - id: fuente_b
+      perfil: perfiles/fuente_dc.yaml
+      transporte: { tipo: tcp, puerto: 5025 }

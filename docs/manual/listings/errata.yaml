@@ -1,0 +1,8 @@
+banco:
+  nombre: errata
+  dispositivos:
+    - id: dmm
+      perfil: perfiles/multimetro.yaml
+      transporte: { tipo: tcp, puerto: 5030 }
+      estado_inicial:
+        tension_entarda: 12.0

@@ -118,6 +118,9 @@ conviviendo dos runtimes, que es el siguiente paso. Ver
 [ADR-0003](docs/adr/0003-absorcion-de-instrusim.md) para el plan de
 consolidación y qué queda por hacer.
 
+- **Manual de uso**: <https://anlaco.github.io/Crucible/> — instalar, arrancar
+  un banco, conectar tu software y describir instrumentos. Fuente en
+  [`docs/manual/`](docs/manual/).
 - Formato: [`docs/diseno/`](docs/diseno/) — [arquitectura](docs/diseno/arquitectura.md),
   [perfil de dispositivo](docs/diseno/formato-de-perfil.md) (ejemplos SCPI,
   Modbus y serial custom), [topología de banco](docs/diseno/topologia-de-banco.md).

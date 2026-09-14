@@ -1,0 +1,76 @@
+name: Manual
+
+# Comprueba el manual de uso (docs/manual/) contra el binario, lo renderiza con
+# mdBook y lo publica en la rama `gh-pages`, que GitHub Pages sirve en
+# https://anlaco.github.io/Crucible/.
+#
+# `gh-pages` solo guarda HTML generado, un commit por publicación: nadie la
+# edita a mano, la fuente es docs/manual/ en main.
+#
+# A diferencia del libro de Anvil, aquí check.sh sí corre antes de publicar: solo
+# necesita el binario, que se compila en un minuto, y pyvisa. Un manual cuyas
+# sesiones ya no coinciden con el runtime no se publica.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/manual/**"
+      - "banco/**"
+      - "crates/crucible/**"
+      - "crates/crucible-core/**"
+      - "crates/instrusim-scpi/**"
+      - ".github/workflows/manual.yml"
+  workflow_dispatch:
+
+# Una publicación a la vez; un push más nuevo sustituye al que esté en curso.
+concurrency:
+  group: manual
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  # Fijada, para que una versión nueva de mdBook no cambie el manual sin commit.
+  MDBOOK_VERSION: v0.5.4
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - run: cargo build --locked -p crucible
+
+      - name: Comprobar el manual
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -q pyvisa pyvisa-py
+          PYTHON="$RUNNER_TEMP/venv/bin/python" docs/manual/check.sh target/debug/crucible
+
+      - name: Instalar mdBook
+        run: |
+          curl -sSL "https://github.com/rust-lang/mdBook/releases/download/${MDBOOK_VERSION}/mdbook-${MDBOOK_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+            | tar xz -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/mdbook" --version
+
+      - run: '"$RUNNER_TEMP/mdbook" build docs/manual'
+
+      # Una rama nueva de un solo commit cada vez: la historia del manual está en
+      # main, y guardar cada renderizado solo haría crecer el repositorio.
+      # `.nojekyll` impide que Pages pase Jekyll por encima del HTML de mdBook.
+      - name: Publicar en gh-pages
+        working-directory: target/manual
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          touch .nojekyll
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "docs: manual de Crucible, renderizado desde ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

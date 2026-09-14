@@ -1,0 +1,5 @@
+$ crucible --validar errata.yaml
+errata.yaml es válido:
+
+  ID   MODELO      RECURSO VISA
+  dmm  MULTIMETRO  TCPIP0::127.0.0.1::5030::SOCKET
