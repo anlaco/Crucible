@@ -25,7 +25,7 @@ Hay una regla de SCPI que conviene tener clara. Tras un `;`, la cabecera
 siguiente es **relativa al nodo de la anterior**, salvo que empiece por `:`:
 
 ```console
-{{#include listings/sesiones/08-compuestos.txt}}
+{{#include ../listings/sesiones/08-compuestos.txt}}
 ```
 
 - `VOLT 5;OUTP ON` funciona: `VOLT` cuelga de la raíz, así que `OUTP` también.
@@ -46,7 +46,7 @@ El multímetro del ejemplo tiene un comando que el real no tiene,
 orden de esta sesión es una conexión distinta:
 
 ```console
-{{#include listings/sesiones/08-estado-compartido.txt}}
+{{#include ../listings/sesiones/08-estado-compartido.txt}}
 ```
 
 Los 12 V fijados por una conexión los mide la siguiente. Y tras `*RST` vuelve a

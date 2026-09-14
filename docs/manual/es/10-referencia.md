@@ -3,7 +3,7 @@
 ## La orden `crucible`
 
 ```console
-{{#include listings/sesiones/10-ayuda.txt}}
+{{#include ../listings/sesiones/10-ayuda.txt}}
 ```
 
 | Forma | Qué hace |

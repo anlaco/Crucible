@@ -18,7 +18,7 @@ Deja:
 Comprueba la instalación:
 
 ```console
-{{#include listings/sesiones/02-version.txt}}
+{{#include ../listings/sesiones/02-version.txt}}
 ```
 
 ## Windows

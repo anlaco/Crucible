@@ -9,6 +9,9 @@
 # Los ficheros que el lector escribe también se incluyen desde listings/, y los
 # del banco de ejemplo desde banco/, así que tampoco pueden desfasarse.
 #
+# Las sesiones son las mismas para los dos idiomas (es/ y en/): Crucible imprime
+# lo mismo lo lea quien lo lea.
+#
 # Uso (desde cualquier sitio):
 #   docs/manual/check.sh [binario crucible]            # comparar
 #   docs/manual/check.sh --record [binario crucible]   # reescribir las sesiones
@@ -150,14 +153,36 @@ for session in "$L"/sesiones/*.txt; do
   fi
 done
 
-# Una sesión que ningún capítulo incluye no comprueba nada que el lector vea.
-echo "sesiones incluidas en algún capítulo:"
-for session in "$L"/sesiones/*.txt; do
-  rel=listings/sesiones/$(basename "$session")
-  if grep -q "{{#include $rel}}" "$MANUAL"/[0-9][0-9]-*.md; then
-    say OK "$rel"
+# Una sesión que un idioma no incluye no comprueba nada que ese lector vea, y
+# suele querer decir que una traducción se ha quedado atrás.
+for idioma in es en; do
+  echo "sesiones incluidas en algún capítulo ($idioma):"
+  for session in "$L"/sesiones/*.txt; do
+    rel=../listings/sesiones/$(basename "$session")
+    if grep -q "{{#include $rel}}" "$MANUAL/$idioma"/[0-9][0-9]-*.md; then
+      say OK "$(basename "$session")"
+    else
+      say FAIL "$(basename "$session") no lo incluye ningún capítulo en $idioma"
+    fi
+  done
+done
+
+# El selector de idioma empareja capítulos por posición con la tabla de
+# idioma.js; si un fichero cambia de nombre sin tocarla, el botón lleva a un 404.
+echo "tabla de capítulos de idioma.js:"
+for idioma in es en; do
+  en_tabla=$(python3 - "$MANUAL/idioma.js" "$idioma" <<'PY'
+import re, sys
+js = open(sys.argv[1]).read()
+lista = re.search(sys.argv[2] + r':\s*\[(.*?)\]', js, re.S).group(1)
+print(" ".join(re.findall(r'"([^"]+)"', lista)))
+PY
+)
+  en_disco=$(cd "$MANUAL/$idioma" && ls [0-9][0-9]-*.md | sed 's/\.md$//' | tr '\n' ' ' | sed 's/ $//')
+  if [ "$en_tabla" = "$en_disco" ]; then
+    say OK "$idioma"
   else
-    say FAIL "$rel no lo incluye ningún capítulo"
+    say FAIL "$idioma: idioma.js dice '$en_tabla' y hay '$en_disco'"
   fi
 done
 

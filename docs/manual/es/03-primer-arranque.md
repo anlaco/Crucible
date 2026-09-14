@@ -10,7 +10,7 @@ antes de describir nada.
 - **Windows:** menú Inicio → Crucible → *Arrancar banco*.
 
 ```console
-{{#include listings/sesiones/03-arranque.txt}}
+{{#include ../listings/sesiones/03-arranque.txt}}
 ```
 
 Cada fila es un instrumento escuchando en su puerto. Mientras la ventana siga
@@ -30,7 +30,7 @@ Para arrancar uno concreto: `crucible ruta/a/banco.yaml`.
 En **otra** terminal, con el banco arrancado:
 
 ```console
-{{#include listings/sesiones/03-idn.txt}}
+{{#include ../listings/sesiones/03-idn.txt}}
 ```
 
 Cada puerto es un instrumento distinto, y cada uno contesta con su `*IDN?`.

@@ -54,7 +54,7 @@ y un `fallback` fijo.
 Contra el banco recién arrancado:
 
 ```console
-{{#include listings/sesiones/07-modelos.txt}}
+{{#include ../listings/sesiones/07-modelos.txt}}
 ```
 
 Paso a paso:
@@ -91,11 +91,11 @@ Los de sintaxis —un paréntesis sin cerrar, una función que no existe— sale
 validar o al arrancar, con la posición:
 
 ```yaml
-{{#include listings/perfiles/formula_rota.yaml}}
+{{#include ../listings/perfiles/formula_rota.yaml}}
 ```
 
 ```console
-{{#include listings/sesiones/07-formula-rota.txt}}
+{{#include ../listings/sesiones/07-formula-rota.txt}}
 ```
 
 Una **variable que no existe** en el estado, en cambio, solo se detecta al

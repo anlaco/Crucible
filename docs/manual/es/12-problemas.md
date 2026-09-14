@@ -3,7 +3,7 @@
 ## «no puede escuchar en 127.0.0.1:5025»
 
 ```console
-{{#include listings/sesiones/12-puerto-ocupado.txt}}
+{{#include ../listings/sesiones/12-puerto-ocupado.txt}}
 ```
 
 Ya hay otro Crucible abierto, u otro programa, en ese puerto. Cierra la otra
@@ -15,7 +15,7 @@ ventana o cambia el puerto en `banco.yaml`. Para ver quién lo tiene:
 ## «no encuentro ningún banco»
 
 ```console
-{{#include listings/sesiones/12-sin-banco.txt}}
+{{#include ../listings/sesiones/12-sin-banco.txt}}
 ```
 
 Has ejecutado `crucible` sin argumentos en una carpeta sin `banco.yaml`, y no

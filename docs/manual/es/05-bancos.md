@@ -32,7 +32,7 @@ sitio donde busca.
 Este es el del ejemplo:
 
 ```yaml
-{{#include ../../banco/banco.yaml}}
+{{#include ../../../banco/banco.yaml}}
 ```
 
 Cada entrada de `dispositivos` es **una unidad**:
@@ -62,7 +62,7 @@ hace falta, de `estado_inicial`:
 ## Validar antes de arrancar
 
 ```console
-{{#include listings/sesiones/05-validar.txt}}
+{{#include ../listings/sesiones/05-validar.txt}}
 ```
 
 `--validar` carga el banco y todos sus perfiles, comprueba patrones, fórmulas y
@@ -73,11 +73,11 @@ errores dicen qué fichero, qué comando y qué está mal.
 Cada instrumento necesita su puerto. Con este banco, que repite el 5025:
 
 ```yaml
-{{#include listings/puerto_repetido.yaml}}
+{{#include ../listings/puerto_repetido.yaml}}
 ```
 
 ```console
-{{#include listings/sesiones/05-puerto-repetido.txt}}
+{{#include ../listings/sesiones/05-puerto-repetido.txt}}
 ```
 
 ## Tres reglas que conviene conocer
@@ -96,11 +96,11 @@ después.
 `tension_entarda` no existe en el perfil del multímetro, y aun así:
 
 ```yaml
-{{#include listings/errata.yaml}}
+{{#include ../listings/errata.yaml}}
 ```
 
 ```console
-{{#include listings/sesiones/05-errata.txt}}
+{{#include ../listings/sesiones/05-errata.txt}}
 ```
 
 El multímetro arrancará midiendo 0 V. Si una unidad no arranca con el valor que

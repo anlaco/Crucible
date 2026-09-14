@@ -1,8 +1,8 @@
 name: Manual
 
 # Comprueba el manual de uso (docs/manual/) contra el binario, lo renderiza con
-# mdBook y lo publica en la rama `gh-pages`, que GitHub Pages sirve en
-# https://anlaco.github.io/Crucible/.
+# mdBook —un libro por idioma, es/ y en/— y lo publica en la rama `gh-pages`,
+# que GitHub Pages sirve en https://anlaco.github.io/Crucible/.
 #
 # `gh-pages` solo guarda HTML generado, un commit por publicación: nadie la
 # edita a mano, la fuente es docs/manual/ en main.
@@ -57,7 +57,9 @@ jobs:
             | tar xz -C "$RUNNER_TEMP"
           "$RUNNER_TEMP/mdbook" --version
 
-      - run: '"$RUNNER_TEMP/mdbook" build docs/manual'
+      - run: docs/manual/build.sh
+        env:
+          MDBOOK: ${{ runner.temp }}/mdbook
 
       # Una rama nueva de un solo commit cada vez: la historia del manual está en
       # main, y guardar cada renderizado solo haría crecer el repositorio.

@@ -15,7 +15,7 @@ Este es el perfil de la fuente del banco de ejemplo. Merece la pena leerlo
 entero: el resto del capítulo lo va desmontando.
 
 ```yaml
-{{#include ../../banco/perfiles/fuente_dc.yaml}}
+{{#include ../../../banco/perfiles/fuente_dc.yaml}}
 ```
 
 ## `dispositivo`
@@ -98,7 +98,7 @@ Un patrón cubre así todas las formas que admite el instrumento real, sin
 enumerarlas. Contra la fuente del ejemplo:
 
 ```console
-{{#include listings/sesiones/06-patrones.txt}}
+{{#include ../listings/sesiones/06-patrones.txt}}
 ```
 
 Las órdenes no contestan nada, como en un instrumento real: por eso tras
@@ -144,7 +144,7 @@ No se corta la conexión ni se contesta nada: se anota en la cola de errores,
 como haría el instrumento. `VOLT:PROT` no está en el perfil de la fuente:
 
 ```console
-{{#include listings/sesiones/06-errores.txt}}
+{{#include ../listings/sesiones/06-errores.txt}}
 ```
 
 `SYST:ERR?` es la primera herramienta para completar un perfil: dice qué
@@ -158,5 +158,5 @@ Crucible para todos los instrumentos (lista completa en el capítulo 8).
 Declararlos es un error:
 
 ```console
-{{#include listings/sesiones/06-comun-declarado.txt}}
+{{#include ../listings/sesiones/06-comun-declarado.txt}}
 ```

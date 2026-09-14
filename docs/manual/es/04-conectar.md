@@ -18,11 +18,11 @@ Con `pip install pyvisa pyvisa-py` basta; no hace falta NI-VISA. Este script
 habla con la fuente y el multímetro del banco de ejemplo:
 
 ```python
-{{#include listings/conectar.py}}
+{{#include ../listings/conectar.py}}
 ```
 
 ```console
-{{#include listings/sesiones/04-pyvisa.txt}}
+{{#include ../listings/sesiones/04-pyvisa.txt}}
 ```
 
 La fuente tiene conectada una carga simulada de 10 Ω, así que a 5 V da medio

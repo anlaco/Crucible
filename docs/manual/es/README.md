@@ -6,6 +6,9 @@ que el aparato físico. Tu software de medida —PyVISA, LabVIEW, un secuenciado
 como [Anvil](https://anlaco.github.io/anvil/)— se conecta a él como si el banco
 estuviera enchufado, sin saber que no lo está.
 
+Este manual también está [en inglés](../en/): el botón **EN** de la barra
+superior lleva a la misma página en el otro idioma.
+
 Este manual explica cómo usarlo: instalarlo, arrancar un banco, conectar tu
 software y describir tus propios instrumentos.
 
