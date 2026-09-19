@@ -93,6 +93,17 @@ objetivo de los primeros hitos, no "cubrir todos los dispositivos".
 - Por la restricción de loopback de Anvil (ADR-0011), el ESP32 en la LAN
   se accede vía un mini-proxy `127.0.0.1:5025 → ESP32` (no se toca Anvil).
 
+## H6-bis — VXI-11 en el runtime · **adelantado a MVP**
+
+Estaba en post-MVP «cuando un caso real lo pida». Ya lo pide: el primer banco
+de cliente usa NI-MAX, sus equipos aparecen como `TCPIP0::…::INSTR`, y quieren
+verlos al descubrir dispositivos. Las dos cosas —el descubrimiento por
+broadcast al portmapper y el descriptor `::INSTR`— son VXI-11.
+
+Sin esto, el banco simulado se ve distinto del real en la herramienta que el
+cliente usa para configurarlo todo. Detalle en
+[bancos/plan-banco-rf.md](bancos/plan-banco-rf.md) §4, Fase 2.
+
 ## H7 — Más transportes en el runtime · post-MVP
 
 - **Serial (RS-232/RS-485)**: el runtime abre puertos serie reales (o
@@ -100,14 +111,30 @@ objetivo de los primeros hitos, no "cubrir todos los dispositivos".
   baratas, fixtures.
 - **GPIB**: el runtime sirve dispositivos por GPIB (requiere hardware
   GPIB o un emulador). Menos prioritario (GPIB es legacy).
-- **USB-TMC**: el runtime sirve dispositivos por USB (requiere driver
-  USB-TMC). Más complejo por dependencia del SO.
+- **USB-TMC**: el runtime sirve dispositivos por USB. **Compromiso de
+  producto, no condicional** (19/09/2026): un simulador de instrumentos que
+  solo sabe hablar TCP no cubre el parque real, y el primer banco de cliente ya
+  trae tres sensores de potencia que en el banco físico son USB.
+  Es el transporte **más caro de todos** porque no basta con hablar el
+  protocolo: el sistema operativo tiene que *enumerar* un dispositivo USB para
+  que VISA le dé un `USB0::…::INSTR`. Los tres caminos conocidos —driver de
+  kernel con la USB Device Emulation de Windows, montaje sobre USB/IP, o un
+  puente hardware en modo *USB gadget*— están evaluados en
+  [bancos/plan-banco-rf.md](bancos/plan-banco-rf.md) §5.6.
 - **PXI**: register-level. Muy específico; post-MVP lejano.
 
 ## Post-MVP
 
 - **Solver de circuito** (Kirchhoff DC, transitorios) — sólo si un caso
   real lo pide.
+- **Camino de RF**: elementos pasivos multipuerto (SPDT, acopladores,
+  atenuadores, cables) y propagación de potencia incidente/reflejada en
+  función de la frecuencia. Dirección de producto decidida el 19/09/2026: al
+  primer cliente se le venderá un gemelo de su banco, no solo instrumentos
+  sueltos. Implicaciones y puertas que no cerrar en
+  [diseno/camino-de-rf.md](diseno/camino-de-rf.md) — entre ellas que **obliga a
+  consolidar los dos linajes** (ADR-0003), porque el formato declarativo no
+  llega hoy al `World` de `instrusim-core`.
 - **Perfiles de DUT** complejos (IV curve, carga activa, térmica)
   definidos por el usuario.
 - **Auto-descubrimiento** de perfiles desde un directorio; **versionado**
@@ -116,8 +143,12 @@ objetivo de los primeros hitos, no "cubrir todos los dispositivos".
   expresable en `formula`.
 - **Catálogo de perfiles** de dispositivos comunes (la "librería" que
   hace al estándar útil de inmediato).
-- **Protocolos adicionales**: DAQmx-style, OPC UA, GigE Vision, VXI-11,
-  HiSLIP — cuando un caso real lo pida.
+- **Protocolos adicionales**: OPC UA, GigE Vision, HiSLIP — cuando un caso
+  real lo pida.
+- **DAQmx-style**: pendiente y con caso real detrás. En el primer banco de
+  cliente la DAQ no es un periférico, es el nexo: controla los conmutadores del
+  camino de RF y los disparos. Mientras no exista, la propagación entre
+  instrumentos no puede cerrar el lazo.
 - **UI** mínima para ver el banco y los dispositivos en vivo.
 
 ## Cómo se gestiona el alcance
