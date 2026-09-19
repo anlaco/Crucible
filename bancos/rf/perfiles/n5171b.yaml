@@ -1,0 +1,120 @@
+# Keysight N5171B EXG — generador de RF analógico, opción 503 (9 kHz – 3 GHz).
+#
+# Sintaxis de los comandos tomada de la referencia SCPI X-Series (N5180-90057);
+# rangos, del datasheet del EXG. Ver docs/bancos/banco-rf.md §3.1.
+#
+# Solo se declara lo que usa el software de test, no el manual entero: el
+# manual del EXG tiene más de mil comandos y declararlos todos no haría el
+# gemelo más fiel, solo más grande.
+
+dispositivo:
+  modelo: N5171B
+  tipo: instrumento
+  # Cuatro campos, como manda IEEE 488.2. El número de serie es inventado:
+  # sustitúyelo por el de la unidad real si el software lo comprueba.
+  idn: "Keysight Technologies,N5171B,MY53050001,B.01.50"
+
+protocolo: scpi
+
+estado:
+  # Frecuencia de la portadora, en Hz. Arranca en el mínimo del instrumento.
+  frecuencia: 9000.0
+  # Amplitud en dBm. Tras *RST el EXG deja la salida al mínimo.
+  potencia: -144.0
+  # Desplazamiento de amplitud que el usuario declara para compensar el cable.
+  offset_potencia: 0.0
+  salida: false
+  modulacion: false
+  modo_frecuencia: "CW"
+  # Pérdida del camino entre la salida del generador y el punto de medida.
+  # No es del instrumento: es del banco. Está aquí para que el sensor de
+  # potencia pueda leer algo coherente cuando exista propagación (brecha B4).
+  perdida_cable_db: 1.5
+
+comandos:
+  # --- Frecuencia -------------------------------------------------------
+  # [:SOURce]:FREQuency[:CW] <value><unit>
+  - patron: "[SOURce:]FREQuency[:CW]"
+    args: [f]
+    muta: { frecuencia: "<f>" }
+  - patron: "[SOURce:]FREQuency[:CW]"
+    query: true
+    modelo: frecuencia_hz
+
+  # El EXG acepta también FREQ:FIX como sinónimo exacto de FREQ:CW.
+  - patron: "[SOURce:]FREQuency:FIXed"
+    args: [f]
+    muta: { frecuencia: "<f>" }
+  - patron: "[SOURce:]FREQuency:FIXed"
+    query: true
+    modelo: frecuencia_hz
+
+  - patron: "[SOURce:]FREQuency:MODE"
+    args: [m]
+    muta: { modo_frecuencia: "<m>" }
+  - patron: "[SOURce:]FREQuency:MODE"
+    query: true
+    respuesta: "{modo_frecuencia}"
+
+  # --- Amplitud ---------------------------------------------------------
+  # [:SOURce]:POWer[:LEVel][:IMMediate][:AMPLitude] <value><unit>
+  - patron: "[SOURce:]POWer[:LEVel][:IMMediate][:AMPLitude]"
+    args: [p]
+    muta: { potencia: "<p>" }
+  - patron: "[SOURce:]POWer[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    modelo: potencia_dbm
+
+  - patron: "[SOURce:]POWer[:LEVel][:IMMediate]:OFFSet"
+    args: [o]
+    muta: { offset_potencia: "<o>" }
+  - patron: "[SOURce:]POWer[:LEVel][:IMMediate]:OFFSet"
+    query: true
+    modelo: offset_dbm
+
+  # --- Salida y modulación ---------------------------------------------
+  - patron: "OUTPut[:STATe]"
+    args: [s]
+    muta: { salida: "<s>" }
+  - patron: "OUTPut[:STATe]"
+    query: true
+    modelo: salida_como_numero
+
+  - patron: "OUTPut:MODulation[:STATe]"
+    args: [s]
+    muta: { modulacion: "<s>" }
+  - patron: "OUTPut:MODulation[:STATe]"
+    query: true
+    modelo: modulacion_como_numero
+
+modelos:
+  # El EXG contesta la frecuencia en Hz y en notación científica, sin unidad.
+  frecuencia_hz:
+    tipo: formula
+    expr: "frecuencia"
+    formato: cientifico:6
+
+  # La amplitud sale con dos decimales; la resolución del instrumento es 0,01 dB.
+  potencia_dbm:
+    tipo: formula
+    expr: "potencia"
+    formato: fijo:2
+
+  offset_dbm:
+    tipo: formula
+    expr: "offset_potencia"
+    formato: fijo:2
+
+  salida_como_numero:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "1"
+    fallback: 0
+    formato: entero
+
+  modulacion_como_numero:
+    tipo: formula
+    cuando: { modulacion: true }
+    expr: "1"
+    fallback: 0
+    formato: entero

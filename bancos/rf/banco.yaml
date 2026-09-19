@@ -1,0 +1,29 @@
+# Banco de RF — muestra.
+#
+# Recoge los equipos del inventario de docs/bancos/banco-rf.md que Crucible
+# puede servir hoy: los que hablan SCPI sobre TCP.
+#
+# NO están, y el motivo está en el documento:
+#   · U2061XA ×3  — SCPI sobre USBTMC; falta transporte USB (brecha B5)
+#   · USB-6343    — NI-DAQmx, no es SCPI (brecha B7)
+#   · NI-9147     — NI-RIO, no es SCPI (brecha B8, y §3.5: no es un cRIO)
+#   · DUT serie   — falta transporte serie (brecha B6)
+#
+# Arrancar:   crucible bancos/rf/banco.yaml
+# Validar:    crucible --validar bancos/rf/banco.yaml
+
+banco:
+  nombre: banco-rf
+  dispositivos:
+    - id: generador
+      perfil: perfiles/n5171b.yaml
+      transporte: { tipo: tcp, puerto: 5025 }
+
+    - id: fuente
+      perfil: perfiles/n5767a.yaml
+      transporte: { tipo: tcp, puerto: 5026 }
+      # La carga que el DUT presenta a la fuente. Con 4 Ω y el límite de
+      # corriente por defecto la fuente trabaja en CV; bajando la resistencia
+      # (o el límite) se la lleva a CC sin tocar el perfil.
+      estado_inicial:
+        carga_ohm: 4.0

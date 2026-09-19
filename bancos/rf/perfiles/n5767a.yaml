@@ -1,0 +1,187 @@
+# Keysight N5767A — fuente DC de sistema, 0–60 V / 0–25 A / 1500 W.
+#
+# Sintaxis y rangos tomados de la guía de usuario de la serie N5700.
+# Ver docs/bancos/banco-rf.md §3.2.
+#
+# Modela el cruce CV/CC y el disparo de OVP, que son los dos comportamientos
+# que un software de test ejercita de verdad. Sin ellos el gemelo solo sabe
+# devolver lo que le han programado, que es justo lo que no hace falta probar.
+
+dispositivo:
+  modelo: N5767A
+  tipo: instrumento
+  idn: "Agilent Technologies,N5767A,US00000001,A.01.08"
+
+protocolo: scpi
+
+estado:
+  tension_programada: 0.0
+  corriente_programada: 25.0   # tras *RST la serie N5700 deja el límite al máximo
+  salida: false
+
+  # Protecciones.
+  ovp_nivel: 66.0              # 110 % del fondo de escala, como la unidad real
+  uvl_nivel: 0.0
+  ocp_activa: false
+  # Se pone a 1 cuando la OVP dispara. Hasta que no llegue OUTP:PROT:CLE, la
+  # salida queda inhibida: es el camino de error que el cliente debe poder
+  # provocar en el gemelo.
+  disparada: false
+
+  # La carga conectada a la salida. No es del instrumento, es del banco: es lo
+  # que decide si la fuente trabaja en CV o en CC.
+  carga_ohm: 4.0
+
+comandos:
+  # --- Programación de salida ------------------------------------------
+  - patron: "[SOURce:]VOLTage[:LEVel][:IMMediate][:AMPLitude]"
+    args: [v]
+    muta: { tension_programada: "<v>" }
+  - patron: "[SOURce:]VOLTage[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    modelo: tension_programada_v
+
+  - patron: "[SOURce:]CURRent[:LEVel][:IMMediate][:AMPLitude]"
+    args: [i]
+    muta: { corriente_programada: "<i>" }
+  - patron: "[SOURce:]CURRent[:LEVel][:IMMediate][:AMPLitude]"
+    query: true
+    modelo: corriente_programada_a
+
+  - patron: "OUTPut[:STATe]"
+    args: [s]
+    muta: { salida: "<s>" }
+  - patron: "OUTPut[:STATe]"
+    query: true
+    modelo: salida_como_numero
+
+  # --- Protecciones -----------------------------------------------------
+  - patron: "[SOURce:]VOLTage:PROTection[:LEVel]"
+    args: [v]
+    muta: { ovp_nivel: "<v>" }
+  - patron: "[SOURce:]VOLTage:PROTection[:LEVel]"
+    query: true
+    modelo: ovp_v
+
+  - patron: "[SOURce:]VOLTage:LIMit:LOW"
+    args: [v]
+    muta: { uvl_nivel: "<v>" }
+  - patron: "[SOURce:]VOLTage:LIMit:LOW"
+    query: true
+    modelo: uvl_v
+
+  - patron: "[SOURce:]CURRent:PROTection:STATe"
+    args: [s]
+    muta: { ocp_activa: "<s>" }
+  - patron: "[SOURce:]CURRent:PROTection:STATe"
+    query: true
+    modelo: ocp_como_numero
+
+  # Rearma la fuente tras un disparo de protección.
+  - patron: "OUTPut:PROTection:CLEar"
+    muta: { disparada: false }
+
+  # --- Medida -----------------------------------------------------------
+  - patron: "MEASure[:SCALar]:VOLTage[:DC]"
+    query: true
+    modelo: tension_medida
+  - patron: "MEASure[:SCALar]:CURRent[:DC]"
+    query: true
+    modelo: corriente_medida
+
+  # --- Estado -----------------------------------------------------------
+  # Bit 1 = CV, bit 0 = CC en la serie N5700.
+  - patron: "STATus:OPERation:CONDition"
+    query: true
+    modelo: modo_regulacion
+  - patron: "STATus:QUEStionable:CONDition"
+    query: true
+    modelo: cuestionable
+
+  # Simulación: cambia la carga conectada sin tocar el perfil. No existe en el
+  # instrumento real; permite a un script provocar el cruce a CC.
+  - patron: "SIMulate:LOAD"
+    args: [r]
+    muta: { carga_ohm: "<r>" }
+
+modelos:
+  tension_programada_v:
+    tipo: formula
+    expr: "tension_programada"
+    formato: fijo:3
+
+  corriente_programada_a:
+    tipo: formula
+    expr: "corriente_programada"
+    formato: fijo:3
+
+  ovp_v:
+    tipo: formula
+    expr: "ovp_nivel"
+    formato: fijo:3
+
+  uvl_v:
+    tipo: formula
+    expr: "uvl_nivel"
+    formato: fijo:3
+
+  salida_como_numero:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "1"
+    fallback: 0
+    formato: entero
+
+  ocp_como_numero:
+    tipo: formula
+    cuando: { ocp_activa: true }
+    expr: "1"
+    fallback: 0
+    formato: entero
+
+  # La corriente que pide la carga es V/R; la fuente entrega como mucho el
+  # límite programado. Si la carga pide más, entra en CC.
+  corriente_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "min(tension_programada / carga_ohm, corriente_programada) + gauss(0, 0.001)"
+    fallback: 0.0
+    formato: fijo:4
+
+  # En CV la salida es la programada. En CC la fuente baja la tensión hasta que
+  # la carga consume justo el límite de corriente: V = I_limite * R.
+  tension_medida:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "min(tension_programada, corriente_programada * carga_ohm) + gauss(0, 0.002)"
+    fallback: 0.0
+    formato: fijo:4
+
+  # 1 = CV (la fuente regula tensión), 0 = CC.
+  #
+  # Está en CV mientras la tensión programada no supere la que da el límite de
+  # corriente sobre la carga, es decir mientras `d = I_lim*R - V_prog` sea
+  # positiva. Lo que habría que escribir es:
+  #
+  #     expr: "corriente_programada * carga_ohm >= tension_programada"
+  #
+  # pero el lenguaje de fórmulas **no tiene comparaciones** (brecha B9 de
+  # docs/bancos/banco-rf.md), así que se saca el signo de `d` con la identidad
+  # (d + |d|) / 2|d|, que vale 1 si d > 0 y 0 si d ≤ 0. El épsilon del
+  # denominador solo está para que d = 0 no divida por cero.
+  #
+  # Es un apaño, y se nota: en cuanto haya comparaciones, esta expresión se
+  # sustituye por la línea de arriba.
+  modo_regulacion:
+    tipo: formula
+    cuando: { salida: true }
+    expr: "(corriente_programada * carga_ohm - tension_programada + abs(corriente_programada * carga_ohm - tension_programada)) / (2 * abs(corriente_programada * carga_ohm - tension_programada) + 1e-9)"
+    fallback: 0
+    formato: entero
+
+  cuestionable:
+    tipo: formula
+    cuando: { disparada: true }
+    expr: "1"
+    fallback: 0
+    formato: entero
