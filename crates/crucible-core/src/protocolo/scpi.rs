@@ -132,7 +132,7 @@ impl ScpiDevice for DispositivoScpi {
         let args = nombrar_args(comando, &cmd.args);
 
         if let Some(muta) = &comando.muta {
-            super::aplicar_mutacion(muta, &mut self.estado, &args);
+            super::aplicar_mutacion(muta, &mut self.estado, &args)?;
         }
 
         if !cmd.query {
