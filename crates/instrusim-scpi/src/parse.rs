@@ -58,16 +58,12 @@ impl Command {
             return Ok(Numeric::Default);
         }
 
-        // Los instrumentos aceptan sufijos de unidad: "10 V", "1e-3A".
-        let sin_unidad: String = raw
-            .chars()
-            .take_while(|c| c.is_ascii_digit() || matches!(c, '+' | '-' | '.' | 'e' | 'E'))
-            .collect();
-
-        sin_unidad
-            .parse::<f64>()
+        // Los instrumentos aceptan sufijos de unidad: "10 V", "2.4 GHZ".
+        // El sufijo lleva el multiplicador, así que no basta con recortarlo;
+        // ver `unit::parse_decimal`.
+        crate::unit::parse_decimal(raw)
             .map(Numeric::Value)
-            .map_err(|_| ScpiError::with_detail(ErrorCode::IllegalParameterValue, raw))
+            .ok_or_else(|| ScpiError::with_detail(ErrorCode::IllegalParameterValue, raw))
     }
 
     /// Un argumento booleano: `ON`, `OFF`, `1`, `0`.

@@ -22,6 +22,7 @@ pub mod parse;
 pub mod pattern;
 pub mod status;
 pub mod table;
+pub mod unit;
 
 pub use device::{ScpiDevice, handle_message};
 pub use error::{ErrorCode, ErrorQueue, ScpiError};
@@ -29,3 +30,4 @@ pub use parse::{Command, Numeric, parse_message};
 pub use pattern::Pattern;
 pub use status::StatusModel;
 pub use table::CommandTable;
+pub use unit::parse_decimal;
