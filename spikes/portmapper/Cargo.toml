@@ -1,0 +1,14 @@
+# Spike desechable, fuera del workspace a propósito: no es parte del producto.
+[package]
+name = "spike-portmapper"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[[bin]]
+name = "spike-portmapper"
+path = "src/main.rs"
+
+[dependencies]
+
+[workspace]

@@ -1,4 +1,7 @@
 /target
+# Tambien el de los spikes, que tienen workspace propio: sin esto, `/target`
+# solo cubre la raiz y los binarios del spike acaban en el repositorio.
+target/
 # Cargo.lock SÍ se versiona: el workspace produce binarios (`crucible`,
 # `instrusim`), y ahí el lock reproducible es lo correcto.
 *.log
@@ -17,3 +20,7 @@ __pycache__/
 
 # Instaladores generados por empaquetado/
 dist/
+
+# Kit de pruebas de la Fase 0: binarios compilados, se regenera con
+# `cargo xwin build --release --target x86_64-pc-windows-msvc`.
+/fase0-kit/
