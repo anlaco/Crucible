@@ -225,6 +225,23 @@ mod tests {
     /// La prueba que de verdad importa: dos clientes distintos, por dos
     /// conexiones distintas, hablando con dos instrumentos que se comunican
     /// entre sí a través del mundo simulado.
+    /// Sondea al multímetro hasta que su lectura se acerque a lo esperado.
+    ///
+    /// Devuelve la última lectura aunque no llegue, para que el `assert` de
+    /// quien llama pueda enseñarla.
+    fn esperar_lectura(dmm: &mut Cliente, esperado: f64, margen: f64) -> f64 {
+        let limite = std::time::Instant::now() + Duration::from_secs(10);
+        let mut ultima = f64::NAN;
+        while std::time::Instant::now() < limite {
+            ultima = dmm.preguntar("MEAS:VOLT:DC?").parse().unwrap();
+            if (ultima - esperado).abs() < margen {
+                return ultima;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        ultima
+    }
+
     #[test]
     fn se_programa_la_fuente_por_un_socket_y_se_mide_por_otro() {
         let (dir_psu, dir_dmm) = levantar();
@@ -232,15 +249,24 @@ mod tests {
         let mut psu = Cliente::conectar(dir_psu);
         let mut dmm = Cliente::conectar(dir_dmm);
 
-        psu.escribir("*RST");
-        psu.escribir("VOLT 3.3");
-        psu.escribir("OUTP ON");
+        // Una consulta encadenada en lugar de tres escrituras sueltas: cuando
+        // llega la respuesta, el rack ha procesado ya todo lo que venía antes.
+        // Confiar en el orden de las escrituras es una carrera de verdad,
+        // porque cada cliente escribe desde su propio hilo.
+        assert_eq!(psu.preguntar("*RST;:VOLT 3.3;:OUTP ON;:OUTP?"), "1");
 
-        // Esperar a que la fuente establezca. El reloj es virtual y corre muy
-        // por encima del tiempo real, así que basta con muy poco.
-        std::thread::sleep(Duration::from_millis(50));
-
-        let lectura: f64 = dmm.preguntar("MEAS:VOLT:DC?").parse().unwrap();
+        // La fuente tarda en establecer, así que se sondea hasta que llegue en
+        // vez de dormir una cantidad fija.
+        //
+        // La diferencia no es cosmética. El reloj del rack es virtual y avanza
+        // un tic por vuelta de `run_rack`, que corre en un hilo propio; el
+        // establecimiento necesita unos cuantos tics. Como cada test levanta su
+        // rack y todos corren en paralelo, en una máquina con pocos núcleos hay
+        // varios de esos hilos compitiendo, y nada garantiza que el de este
+        // test reciba CPU suficiente dentro de un plazo fijo. Con `sleep(50ms)`
+        // el test pasaba en Linux y fallaba en el Windows de CI, leyendo casi
+        // cero porque la rampa apenas había empezado.
+        let lectura = esperar_lectura(&mut dmm, 3.3, 5e-3);
         assert!((lectura - 3.3).abs() < 5e-3, "el multímetro leyó {lectura}");
     }
 
