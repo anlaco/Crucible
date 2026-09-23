@@ -1,5 +1,5 @@
 use crucible::{aceptar_conexiones, bind_tcp};
-use crucible_core::{Banco, Dispositivo, Perfil};
+use crucible_core::{Banco, Dispositivo, Perfil, Transporte};
 use std::path::{Path, PathBuf};
 
 const AYUDA: &str = "\
@@ -18,7 +18,8 @@ BANCO POR DEFECTO (sin argumentos), el primero que exista de:
   3. ../share/crucible/banco/banco.yaml               (instalación Linux)
 
 Cada instrumento escucha en 127.0.0.1 y en su puerto. Desde VISA:
-  TCPIP0::127.0.0.1::<puerto>::SOCKET
+  TCPIP0::127.0.0.1::<puerto>::SOCKET  (transporte tcp)
+  TCPIP0::127.0.0.1::inst0::INSTR      (transporte vxi11)
 
 Manual: https://anlaco.github.io/Crucible/";
 
@@ -97,8 +98,7 @@ async fn ejecutar(args: Vec<String>) -> anyhow::Result<()> {
 /// Un instrumento listo para servirse.
 struct Instrumento {
     id: String,
-    host: String,
-    puerto: u16,
+    transporte: Transporte,
     disp: Dispositivo,
 }
 
@@ -123,8 +123,10 @@ fn cargar(path: &Path, puerto: Option<u16>) -> anyhow::Result<Vec<Instrumento>> 
         let id = perfil.dispositivo.modelo.clone();
         vec![Instrumento {
             id,
-            host: "127.0.0.1".into(),
-            puerto: puerto.unwrap_or(5025),
+            transporte: Transporte::Tcp {
+                host: Some("127.0.0.1".into()),
+                puerto: Some(puerto.unwrap_or(5025)),
+            },
             disp: Dispositivo::from_perfil(perfil)?,
         }]
     } else {
@@ -150,20 +152,12 @@ fn cargar_banco(path: &Path, texto: &str) -> anyhow::Result<Vec<Instrumento>> {
 
     let mut out = Vec::new();
     for (inst, disp) in dispositivos {
-        if inst.transporte.tipo != "tcp" {
-            anyhow::bail!(
-                "dispositivo '{}': transporte '{}' no soportado; de momento solo 'tcp'",
-                inst.id,
-                inst.transporte.tipo
-            );
+        if inst.transporte.puerto().is_none() {
+            anyhow::bail!("dispositivo '{}': falta 'transporte.puerto'", inst.id);
         }
-        let puerto = inst.transporte.puerto.ok_or_else(|| {
-            anyhow::anyhow!("dispositivo '{}': falta 'transporte.puerto'", inst.id)
-        })?;
         out.push(Instrumento {
             id: inst.id,
-            host: inst.transporte.host.unwrap_or_else(|| "127.0.0.1".into()),
-            puerto,
+            transporte: inst.transporte,
             disp,
         });
     }
@@ -174,38 +168,77 @@ fn cargar_banco(path: &Path, texto: &str) -> anyhow::Result<Vec<Instrumento>> {
 /// Mejor decirlo con sus nombres que dejar que el sistema diga «address in use».
 fn comprobar_puertos_unicos(instrumentos: &[Instrumento]) -> anyhow::Result<()> {
     for (i, a) in instrumentos.iter().enumerate() {
-        if let Some(b) = instrumentos[i + 1..]
-            .iter()
-            .find(|b| b.puerto == a.puerto && b.host == a.host)
-        {
+        if let Some(b) = instrumentos[i + 1..].iter().find(|b| {
+            b.transporte.puerto() == a.transporte.puerto()
+                && b.transporte.host_or_default() == a.transporte.host_or_default()
+                && b.transporte.is_vxi11() == a.transporte.is_vxi11()
+                && (!b.transporte.is_vxi11()
+                    || b.transporte.device_name() == a.transporte.device_name())
+        }) {
+            let host_a = a.transporte.host_or_default();
+            let puerto_a = a.transporte.puerto().unwrap_or(0);
             anyhow::bail!(
-                "'{}' y '{}' usan los dos {}:{}; cada instrumento necesita su puerto",
+                "'{}' y '{}' usan los dos {}:{}; cada instrumento necesita su puerto{}",
                 a.id,
                 b.id,
-                a.host,
-                a.puerto
+                host_a,
+                puerto_a,
+                if a.transporte.is_vxi11() {
+                    format!(" (device {})", a.transporte.device_name())
+                } else {
+                    String::new()
+                }
             );
         }
     }
     Ok(())
 }
 
+enum Listo {
+    Tcp {
+        inst: Instrumento,
+        listener: tokio::net::TcpListener,
+    },
+    Vxi11 {
+        inst: Instrumento,
+        listener: tokio::net::TcpListener,
+    },
+}
+
 async fn arrancar(path: &Path, instrumentos: Vec<Instrumento>) -> anyhow::Result<()> {
     // Se enlazan todos antes de servir ninguno: si un puerto está ocupado, el
     // banco no arranca. Un banco al que le falta un instrumento no está
     // degradado, da resultados falsos.
-    let mut listos = Vec::new();
+    let mut listos: Vec<Listo> = Vec::new();
     for inst in instrumentos {
-        let listener = bind_tcp(&inst.host, inst.puerto).await.map_err(|e| {
-            anyhow::anyhow!(
-                "'{}' no puede escuchar en {}:{} ({e}). ¿Hay otro programa, u otro \
-                 Crucible, usando ese puerto?",
-                inst.id,
-                inst.host,
-                inst.puerto
-            )
-        })?;
-        listos.push((inst, listener));
+        let host = inst.transporte.host_or_default().to_string();
+        let puerto = inst.transporte.puerto().unwrap();
+        let is_vxi = inst.transporte.is_vxi11();
+        if is_vxi {
+            let listener = crucible_vxi11::bind_vxi11(&host, puerto)
+                .await
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "'{}' no puede escuchar en {}:{} ({e}). ¿Hay otro programa, u otro \
+                         Crucible, usando ese puerto?",
+                        inst.id,
+                        host,
+                        puerto
+                    )
+                })?;
+            listos.push(Listo::Vxi11 { inst, listener });
+        } else {
+            let listener = bind_tcp(&host, puerto).await.map_err(|e| {
+                anyhow::anyhow!(
+                    "'{}' no puede escuchar en {}:{} ({e}). ¿Hay otro programa, u otro \
+                     Crucible, usando ese puerto?",
+                    inst.id,
+                    host,
+                    puerto
+                )
+            })?;
+            listos.push(Listo::Tcp { inst, listener });
+        }
     }
 
     println!(
@@ -213,17 +246,55 @@ async fn arrancar(path: &Path, instrumentos: Vec<Instrumento>) -> anyhow::Result
         env!("CARGO_PKG_VERSION"),
         path.display()
     );
-    imprimir_tabla(&listos.iter().map(|(i, _)| i).collect::<Vec<_>>());
+    let refs: Vec<&Instrumento> = listos
+        .iter()
+        .map(|l| match l {
+            Listo::Tcp { inst, .. } | Listo::Vxi11 { inst, .. } => inst,
+        })
+        .collect();
+    imprimir_tabla(&refs);
     println!("\nListo. Ctrl+C para parar.");
 
-    let mut tareas = Vec::new();
-    for (inst, listener) in listos {
-        let id = inst.id.clone();
-        tareas.push(tokio::spawn(async move {
-            if let Err(e) = aceptar_conexiones(listener, inst.disp).await {
-                eprintln!("error en '{id}': {e}");
+    // Portmapper opcional si hay algún VXI-11 (requiere privilegio en 111)
+    let vxi_ports: Vec<u16> = listos
+        .iter()
+        .filter_map(|l| match l {
+            Listo::Vxi11 { inst, .. } => inst.transporte.puerto(),
+            _ => None,
+        })
+        .collect();
+    if !vxi_ports.is_empty() {
+        let pm_port = vxi_ports[0];
+        tokio::spawn(async move {
+            if let Err(e) = crucible_vxi11::servir_portmapper(pm_port, "0.0.0.0:111").await {
+                eprintln!("portmapper no disponible (requiere admin para UDP 111): {e:#}");
+                eprintln!("Los instrumentos VXI-11 siguen accesibles por su puerto TCP directo.");
             }
-        }));
+        });
+    }
+
+    let mut tareas = Vec::new();
+    for listo in listos {
+        match listo {
+            Listo::Tcp { inst, listener } => {
+                let id = inst.id.clone();
+                tareas.push(tokio::spawn(async move {
+                    if let Err(e) = aceptar_conexiones(listener, inst.disp).await {
+                        eprintln!("error en '{id}': {e}");
+                    }
+                }));
+            }
+            Listo::Vxi11 { inst, listener } => {
+                let id = inst.id.clone();
+                tareas.push(tokio::spawn(async move {
+                    if let Err(e) =
+                        crucible_vxi11::aceptar_conexiones_vxi11(listener, inst.disp).await
+                    {
+                        eprintln!("error en '{id}': {e}");
+                    }
+                }));
+            }
+        }
     }
 
     tokio::select! {
@@ -269,11 +340,10 @@ fn imprimir_tabla<I: std::borrow::Borrow<Instrumento>>(instrumentos: &[I]) {
     for i in instrumentos {
         let i = i.borrow();
         println!(
-            "  {:ancho_id$}  {:ancho_modelo$}  TCPIP0::{}::{}::SOCKET",
+            "  {:ancho_id$}  {:ancho_modelo$}  {}",
             i.id,
             i.disp.modelo(),
-            i.host,
-            i.puerto
+            i.transporte.resource_string()
         );
     }
 }

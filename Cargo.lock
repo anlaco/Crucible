@@ -32,6 +32,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "crucible-core",
+ "crucible-vxi11",
  "serde_yaml",
  "tokio",
 ]
@@ -45,6 +46,15 @@ dependencies = [
  "serde",
  "serde_yaml",
  "thiserror",
+]
+
+[[package]]
+name = "crucible-vxi11"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "crucible-core",
+ "tokio",
 ]
 
 [[package]]
