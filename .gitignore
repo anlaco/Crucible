@@ -24,3 +24,7 @@ dist/
 # Kit de pruebas de la Fase 0: binarios compilados, se regenera con
 # `cargo xwin build --release --target x86_64-pc-windows-msvc`.
 /fase0-kit/
+
+# Volcado de sesion de GNU Octave: lo deja al salir en el directorio desde el
+# que se arranco, y no tiene nada que ver con el repositorio.
+octave-workspace
