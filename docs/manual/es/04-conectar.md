@@ -58,8 +58,56 @@ El software que hoy abre `TCPIP0::192.168.1.10::5025::SOCKET`,
 las direcciones en su configuración; los puertos los decides tú en el
 `banco.yaml`.
 
-Si usa recursos `::INSTR` (VXI-11), cámbialos por `::SOCKET`: Crucible todavía
-no habla VXI-11 (ver [Qué no hace](11-limitaciones.md)).
+Si usa recursos `::INSTR` (VXI-11), puedes dejarlos: declara el transporte
+`vxi11` en el banco (ver más abajo) o, si prefieres no complicarte, cámbialos
+por `::SOCKET`.
+
+## VXI-11 (`::INSTR`)
+
+Si tu software no puede cambiar de recurso, pon `tipo: vxi11` en el transporte
+y dale a cada instrumento su IP, como en el banco real:
+
+```yaml
+- id: generador
+  perfil: perfiles/n5171b.yaml
+  transporte: { tipo: vxi11, host: 127.0.0.2, puerto: 5025, device: inst0 }
+
+- id: fuente
+  perfil: perfiles/n5767a.yaml
+  transporte: { tipo: vxi11, host: 127.0.0.3, puerto: 5025, device: inst0 }
+```
+
+```text
+TCPIP0::127.0.0.2::inst0::INSTR
+TCPIP0::127.0.0.3::inst0::INSTR
+```
+
+Que es exactamente la forma del banco físico: cada equipo es una caja con su
+IP, su portmapper en el UDP 111 y su device `inst0`. Del banco real al
+simulado solo cambian las direcciones, ni el puerto ni el device.
+
+**En Linux** todo `127.x.x.x` es local y no hay que configurar nada.
+**En Windows** solo responde `127.0.0.1`. Allí pon los instrumentos en esa IP,
+con el mismo puerto, y distínguelos por el `device`:
+
+```yaml
+transporte: { tipo: vxi11, host: 127.0.0.1, puerto: 5025, device: inst0 }
+transporte: { tipo: vxi11, host: 127.0.0.1, puerto: 5025, device: inst1 }
+```
+
+Esa segunda forma es la de un chasis VXI o una pasarela LAN/GPIB: una sola
+dirección para varios instrumentos. Funciona igual de bien, pero obliga a
+tocar los recursos de tu software.
+
+**Hace falta el puerto UDP 111**, que es privilegiado. En Linux, una vez:
+
+```bash
+sudo setcap 'cap_net_bind_service=+ep' /ruta/a/crucible
+```
+
+En Windows, arranca como administrador. Si no, el banco no arranca y te dice
+exactamente esto: prefiere no arrancar a anunciar instrumentos que luego no
+encuentra nadie.
 
 ## Anvil
 

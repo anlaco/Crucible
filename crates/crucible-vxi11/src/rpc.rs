@@ -19,6 +19,10 @@ pub const MSG_CALL: u32 = 0;
 pub const MSG_REPLY: u32 = 1;
 pub const REPLY_ACCEPTED: u32 = 0;
 pub const ACCEPT_SUCCESS: u32 = 0;
+/// The server does not serve this program at all.
+pub const ACCEPT_PROG_UNAVAIL: u32 = 1;
+/// The server serves this program, but not in the version that was asked for.
+pub const ACCEPT_PROG_MISMATCH: u32 = 2;
 
 pub fn write_u32(buf: &mut Vec<u8>, v: u32) {
     buf.extend_from_slice(&v.to_be_bytes());
@@ -99,6 +103,35 @@ pub fn write_reply_header(buf: &mut Vec<u8>, xid: u32) {
     write_u32(buf, REPLY_ACCEPTED);
     write_auth_null(buf);
     write_u32(buf, ACCEPT_SUCCESS);
+}
+
+/// Reply for a program we do not serve: accepted message, PROG_UNAVAIL.
+///
+/// Note there is no `write_reply_header` here: that helper always writes
+/// SUCCESS, and an accepted reply that is not SUCCESS carries a different
+/// status, not a patched one.
+pub fn write_prog_unavail(xid: u32) -> Vec<u8> {
+    let mut buf = Vec::new();
+    write_u32(&mut buf, xid);
+    write_u32(&mut buf, MSG_REPLY);
+    write_u32(&mut buf, REPLY_ACCEPTED);
+    write_auth_null(&mut buf);
+    write_u32(&mut buf, ACCEPT_PROG_UNAVAIL);
+    buf
+}
+
+/// Reply for a program we serve but in a version we do not: accepted message,
+/// PROG_MISMATCH, followed by the range of versions we do speak.
+pub fn write_prog_mismatch(xid: u32, low: u32, high: u32) -> Vec<u8> {
+    let mut buf = Vec::new();
+    write_u32(&mut buf, xid);
+    write_u32(&mut buf, MSG_REPLY);
+    write_u32(&mut buf, REPLY_ACCEPTED);
+    write_auth_null(&mut buf);
+    write_u32(&mut buf, ACCEPT_PROG_MISMATCH);
+    write_u32(&mut buf, low);
+    write_u32(&mut buf, high);
+    buf
 }
 
 /// Parsea cabecera CALL y devuelve (xid, prog, vers, proc, offset_args).

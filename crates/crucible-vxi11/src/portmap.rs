@@ -1,18 +1,32 @@
-//! Portmapper UDP 111 (prog 100000) mínimo para anunciar VXI-11.
-//! Responde a GETPORT(3) para PROG_VXI11_CORE 395183 con el puerto TCP del core.
+//! Minimal ONC RPC portmapper (program 100000) on UDP 111.
+//!
+//! A VISA client that is given `TCPIP0::host::inst0::INSTR` has no port to
+//! connect to, so the first thing it does is ask the portmapper on UDP 111
+//! "which TCP port serves program 395183?". Without an answer to that question
+//! the resource string simply does not resolve, which is why Crucible treats
+//! the portmapper as part of the bank and not as an optional extra.
+//!
+//! We answer GETPORT(3) and nothing else that matters.
 
 use crate::rpc::*;
 use tokio::net::UdpSocket;
 
-/// Arranca el portmapper en 0.0.0.0:111 (o puerto alternativo para tests).
-/// `vxi_port` es el puerto TCP donde escucha el core VXI-11.
-pub async fn servir_portmapper(vxi_port: u16, bind_addr: &str) -> anyhow::Result<()> {
-    let socket = UdpSocket::bind(bind_addr).await?;
-    eprintln!(
-        "portmapper escuchando en {} -> vxi11 en {}",
-        socket.local_addr()?,
-        vxi_port
-    );
+/// Binds the portmapper socket.
+///
+/// Kept apart from `serve_portmapper` on purpose: the bank binds every socket
+/// it needs BEFORE it announces itself, so a failure here (UDP 111 is a
+/// privileged port) stops the bank instead of leaving it half up.
+pub async fn bind_portmapper(host: &str, port: u16) -> anyhow::Result<UdpSocket> {
+    let addr = format!("{}:{}", host, port);
+    Ok(UdpSocket::bind(&addr).await?)
+}
+
+/// Answers portmapper requests forever, always pointing at `vxi_port`.
+///
+/// There is a single `vxi_port` because there is a single VXI-11 core
+/// listener for the whole bank; the instruments are told apart by their
+/// device name, not by their port.
+pub async fn serve_portmapper(socket: UdpSocket, vxi_port: u16) -> anyhow::Result<()> {
     let mut buf = vec![0u8; 2048];
     loop {
         let (n, peer) = socket.recv_from(&mut buf).await?;
@@ -79,6 +93,44 @@ mod tests {
         write_u32(&mut call, 6); // TCP
         write_u32(&mut call, 0);
         call
+    }
+
+    /// The unit tests above check the bytes; this one checks the wiring, so
+    /// that `bind_portmapper` + `serve_portmapper` really answer a client.
+    /// It binds on port 0, not on 111, so it needs no privileges.
+    #[tokio::test]
+    async fn the_portmapper_answers_over_udp() {
+        let socket = bind_portmapper("127.0.0.1", 0).await.unwrap();
+        let portmapper_port = socket.local_addr().unwrap().port();
+        tokio::spawn(serve_portmapper(socket, 7777));
+
+        let client = UdpSocket::bind("127.0.0.1:0").await.unwrap();
+        client
+            .send_to(
+                &build_getport(42, PROG_VXI11_CORE),
+                ("127.0.0.1", portmapper_port),
+            )
+            .await
+            .unwrap();
+
+        let mut buf = [0u8; 512];
+        // Con tope de tiempo: si nadie contesta, el test falla en vez de
+        // colgar la CI.
+        let (n, _) = tokio::time::timeout(
+            std::time::Duration::from_secs(5),
+            client.recv_from(&mut buf),
+        )
+        .await
+        .expect("el portmapper no contestó en 5 s")
+        .unwrap();
+
+        let mut pos = 0;
+        assert_eq!(read_u32(&buf[..n], &mut pos).unwrap(), 42);
+        let _message_type = read_u32(&buf[..n], &mut pos).unwrap();
+        let _reply_state = read_u32(&buf[..n], &mut pos).unwrap();
+        skip_auth(&buf[..n], &mut pos).unwrap();
+        let _accept_state = read_u32(&buf[..n], &mut pos).unwrap();
+        assert_eq!(read_u32(&buf[..n], &mut pos).unwrap(), 7777);
     }
 
     #[test]

@@ -4,7 +4,9 @@ Worth knowing before you describe your bench.
 
 | Limitation | Consequence |
 |---|---|
-| **Only SCPI over a TCP socket** (`::SOCKET`). No VXI-11 (`::INSTR`), HiSLIP, USB, GPIB or serial. | Your software's `TCPIP0::…::INSTR` resources must become `TCPIP0::…::<port>::SOCKET`. |
+| **Only SCPI over a TCP socket** (`::SOCKET`) **and VXI-11** (`::INSTR`). No HiSLIP, USB, GPIB or serial. | A bench on GPIB or USB cannot be simulated yet. |
+| **VXI-11 needs UDP port 111**, which is privileged. | You must start with permissions (`sudo setcap 'cap_net_bind_service=+ep' crucible` on Linux, administrator on Windows) or the bench does not start. |
+| **One IP per instrument only on Linux.** Windows answers on `127.0.0.1` only. | On Windows the instruments share an IP and are told apart by their port (`tcp`) or their `device` (`vxi11`). |
 | **No Modbus or custom serial protocols.** The format anticipates them, but a profile that is not `scpi` does not start. | A thermal camera or a fixture with its own protocol cannot be simulated yet. |
 | **Instruments do not see each other.** The supply does not power the multimeter. | To chain values, your script sets them (chapter 8). |
 | **No conditionals in formulas.** `cuando` only chooses between the formula and a fixed `fallback`. | A `READ?` that changes with the configured function (voltage or current) cannot be modelled; simulate the one your test uses. |

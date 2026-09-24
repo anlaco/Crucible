@@ -2,5 +2,5 @@ pub mod core;
 pub mod portmap;
 pub mod rpc;
 
-pub use core::{aceptar_conexiones_vxi11, bind_vxi11};
-pub use portmap::servir_portmapper;
+pub use core::{DeviceMap, bind_vxi11, serve_connections};
+pub use portmap::{bind_portmapper, serve_portmapper};

@@ -1,3 +1,18 @@
+# Mismo banco de RF que banco.yaml, pero servido por VXI-11 en vez de por
+# socket TCP, que es lo que espera NI-MAX cuando se anade el instrumento como
+# TCPIP0::...::INSTR.
+#
+# Cada instrumento tiene su propia IP y se llama inst0, igual que en el banco
+# real: alli cada equipo es una caja con su IP, su portmapper en el UDP 111 y
+# su device inst0. Lo unico que cambia respecto al banco fisico son las
+# direcciones.
+#
+# Solo Linux: todo 127.x.x.x es local sin configurar nada. En Windows unicamente
+# responde 127.0.0.1, asi que alli hay que poner los dos instrumentos en esa IP
+# con el mismo puerto y distinguirlos por 'device' (inst0 e inst1).
+#
+# Hace falta el portmapper en UDP 111, que es privilegiado:
+#   sudo setcap 'cap_net_bind_service=+ep' target/debug/crucible
 banco:
   nombre: banco-rf-vxi11
   dispositivos:
@@ -5,13 +20,14 @@ banco:
       perfil: perfiles/n5171b.yaml
       transporte:
         tipo: vxi11
-        host: 127.0.0.1
+        host: 127.0.0.2
         puerto: 5025
         device: inst0
+
     - id: fuente
       perfil: perfiles/n5767a.yaml
       transporte:
         tipo: vxi11
-        host: 127.0.0.1
-        puerto: 5026
-        device: inst1
+        host: 127.0.0.3
+        puerto: 5025
+        device: inst0

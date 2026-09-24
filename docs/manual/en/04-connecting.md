@@ -57,8 +57,57 @@ Software that today opens `TCPIP0::192.168.1.10::5025::SOCKET`,
 `TCPIP0::127.0.0.1::5025::SOCKET`, `TCPIP0::127.0.0.1::5026::SOCKET`… Change the
 addresses in its configuration; you choose the ports in `banco.yaml`.
 
-If it uses `::INSTR` (VXI-11) resources, change them to `::SOCKET`: Crucible
-does not speak VXI-11 yet (see [What it does not do](11-limitations.md)).
+If it uses `::INSTR` (VXI-11) resources, you can keep them: declare the
+`vxi11` transport in the bench (see below) or, if you would rather keep things
+simple, change them to `::SOCKET`.
+
+## VXI-11 (`::INSTR`)
+
+If your software cannot change resource strings, set `tipo: vxi11` in the
+transport and give each instrument its own IP, like the real bench:
+
+```yaml
+- id: generador
+  perfil: perfiles/n5171b.yaml
+  transporte: { tipo: vxi11, host: 127.0.0.2, puerto: 5025, device: inst0 }
+
+- id: fuente
+  perfil: perfiles/n5767a.yaml
+  transporte: { tipo: vxi11, host: 127.0.0.3, puerto: 5025, device: inst0 }
+```
+
+```text
+TCPIP0::127.0.0.2::inst0::INSTR
+TCPIP0::127.0.0.3::inst0::INSTR
+```
+
+That is exactly the shape of the physical bench: every instrument is a box
+with its own IP, its own portmapper on UDP 111 and its device `inst0`. Going
+from the real bench to the simulated one, only the addresses change, neither
+the port nor the device.
+
+**On Linux** every `127.x.x.x` address is local and needs no setting up.
+**On Windows** only `127.0.0.1` answers. There, put the instruments on that
+IP, on the same port, and tell them apart by their `device`:
+
+```yaml
+transporte: { tipo: vxi11, host: 127.0.0.1, puerto: 5025, device: inst0 }
+transporte: { tipo: vxi11, host: 127.0.0.1, puerto: 5025, device: inst1 }
+```
+
+That second shape is the one of a VXI chassis or a LAN/GPIB gateway: a single
+address for several instruments. It works just as well, but it does force you
+to touch your software's resource strings.
+
+**UDP port 111 is required**, and it is privileged. On Linux, once:
+
+```bash
+sudo setcap 'cap_net_bind_service=+ep' /path/to/crucible
+```
+
+On Windows, start as administrator. Otherwise the bench does not start and
+says exactly this: it would rather not start than advertise instruments
+nobody can then find.
 
 ## Anvil
 

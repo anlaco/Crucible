@@ -13,7 +13,15 @@ BANCO POR DEFECTO (sin argumentos), el primero que exista de:
   2. banco/banco.yaml junto al ejecutable            (instalación Windows)
   3. ../share/crucible/banco/banco.yaml               (instalación Linux)
 
-Cada instrumento escucha en 127.0.0.1 y en su puerto. Desde VISA:
-  TCPIP0::127.0.0.1::<puerto>::SOCKET
+Cada instrumento tiene su dirección. Desde VISA:
+  TCPIP0::127.0.0.1::<puerto>::SOCKET  (transporte tcp)
+  TCPIP0::127.0.0.2::inst0::INSTR      (transporte vxi11)
+
+Como en un banco real, cada instrumento puede tener su propia IP: en Linux
+todo 127.x.x.x es local y no hay que configurar nada; en Windows solo
+responde 127.0.0.1, y ahí se distinguen por el puerto.
+
+Los instrumentos vxi11 necesitan además el portmapper en UDP 111 de su IP,
+que es un puerto privilegiado: en Linux hace falta sudo o setcap.
 
 Manual: https://anlaco.github.io/Crucible/
