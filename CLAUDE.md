@@ -118,8 +118,9 @@ sesiones: solo para una sesión nueva, y revisando el diff antes de commitear.
 
 ## Tests
 
-- Unitarios en `mod tests` dentro del propio fichero, nombrados como la
-  propiedad que afirman: `la_integracion_reduce_el_ruido`.
+- Unitarios en `mod tests` dentro del propio fichero, nombrados en inglés como
+  la propiedad que afirman: `integrating_reduces_the_noise`. Los de castellano
+  que quedan (`la_integracion_reduce_el_ruido`) se renombran al tocarlos.
 - `VirtualClock`, no `WallClock`: reproducible al bit y sin esperas.
 - Los que abren sockets usan el puerto `0`. Sincroniza con una consulta
   encadenada (`"VOLT 7;:VOLT?"`) o sondeando con límite, **nunca con un `sleep`
@@ -142,9 +143,14 @@ sesiones: solo para una sesión nueva, y revisando el diff antes de commitear.
 ## Estilo
 
 - `cargo fmt` por defecto; clippy sin avisos.
-- API pública en inglés, siguiendo el dominio (SCPI, clases IVI). **Comentarios,
-  documentación y nombres de test en castellano**, explicando el *porqué* y no
-  el *qué*.
+- **Código en inglés**: API pública siguiendo el dominio (SCPI, clases IVI), y
+  también comentarios, documentación y nombres de test, explicando el *porqué*
+  y no el *qué*.
+- Quedan en castellano, y no por descuido: **los mensajes que ve el usuario**
+  (ayuda, errores, tabla de arranque), porque el manual los compara letra a
+  letra, y **los commits**. El código antiguo sigue comentado en castellano;
+  se traduce al tocarlo, no en una pasada aparte, así que **conviven los dos
+  idiomas en el mismo fichero** y no hay que «arreglarlo».
 
 ## Commits y PR
 
