@@ -1,0 +1,25 @@
+# The Crucible manual in English, rendered with mdBook.
+#
+#   docs/manual/build.sh          # both languages and the landing page → target/manual/
+#   mdbook serve docs/manual/en   # this one only, on http://localhost:3000
+#
+# Chapters are plain Markdown. Terminal sessions and example files are not
+# copied in: they are included with {{#include}} from ../listings/ and from
+# banco/, the same files the Spanish edition includes, and check.sh keeps them
+# true.
+
+[book]
+title = "Crucible Manual"
+authors = ["ANLACO"]
+language = "en"
+src = "."
+
+[build]
+build-dir = "../../../target/manual/en"
+create-missing = false
+
+[output.html]
+site-url = "/Crucible/en/"
+additional-js = ["../idioma.js"]
+git-repository-url = "https://github.com/anlaco/Crucible"
+edit-url-template = "https://github.com/anlaco/Crucible/edit/main/docs/manual/en/{path}"
